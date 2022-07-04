@@ -25,8 +25,6 @@ export class AuthController {
   }
 
   // 로그아웃
-  // @ApiBody({type: })
-  // @ApiCreatedResponse({description: '성공', type: })
   @Post('auth/logout')
   async logout() {
     return;
