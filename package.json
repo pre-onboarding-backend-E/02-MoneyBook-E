@@ -24,11 +24,19 @@
     "@nestjs/common": "^8.0.0",
     "@nestjs/config": "^2.1.0",
     "@nestjs/core": "^8.0.0",
+<<<<<<< HEAD
     "@nestjs/passport": "^8.2.2",
+=======
+    "@nestjs/mapped-types": "^1.0.1",
+>>>>>>> de702d1c07bc87f03799e305181906bec762f17f
     "@nestjs/platform-express": "^8.0.0",
     "@nestjs/swagger": "^5.2.1",
     "@nestjs/typeorm": "^8.1.4",
     "@types/dotenv": "^8.2.0",
+<<<<<<< HEAD
+=======
+    "class-transformer": "^0.5.1",
+>>>>>>> de702d1c07bc87f03799e305181906bec762f17f
     "class-validator": "^0.13.2",
     "config": "^3.3.7",
     "cross-env": "^7.0.3",
