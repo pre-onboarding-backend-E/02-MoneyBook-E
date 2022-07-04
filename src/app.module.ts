@@ -1,9 +1,9 @@
-import { Module, NotFoundException } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UsersModule } from './users/users.module';
+import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
-import { MoneyBooksModule } from './money-books/money-books.module';
+import { MoneyBooksModule } from './moneyBook/moneyBook.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 
@@ -13,7 +13,7 @@ import { ConfigModule } from '@nestjs/config';
       isGlobal: true,
       envFilePath: [`env/development.env`, `env/.env`],
     }),
-    UsersModule,
+    UserModule,
     AuthModule,
     MoneyBooksModule,
     TypeOrmModule.forRoot({

@@ -1,6 +1,5 @@
-/* eslint-disable prettier/prettier */
 export const HttpErrorType = {
-  BAD_REQUEST: 400, 
+  BAD_REQUEST: 400,
   UNAUTHORIZED: 401,
   PAYMENT_REQUIRED: 402,
   FORBIDDEN: 403,
