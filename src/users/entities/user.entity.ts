@@ -6,8 +6,9 @@ import {
   UpdateDateColumn,
   CreateDateColumn,
 } from 'typeorm';
+
 @Entity()
-class User {
+export class User {
   @ApiProperty()
   @PrimaryGeneratedColumn()
   public id?: number;
