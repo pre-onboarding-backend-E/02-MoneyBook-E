@@ -1,4 +1,5 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { ApiBody, ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
 import { LoginDto } from 'src/user/dto/login.dto';
 import { LoginResponse } from 'src/user/entities/login.response';
@@ -20,9 +21,11 @@ export class UserController {
   // 로그인
   @ApiBody({ type: LoginDto })
   @ApiCreatedResponse({ description: '성공', type: LoginResponse })
+  @UseGuards(AuthGuard('local'))
   @Post('/login')
-  async login() {
-    return;
+  async login(@Body() userData: LoginDto) {
+    const result = await this.userService.login(userData);
+    return result;
   }
 
   // 회원 가입
