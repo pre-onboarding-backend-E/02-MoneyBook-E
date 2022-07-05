@@ -37,17 +37,21 @@ DB_DATABASE=money-book
 
 <aside>
 💡
-
 </aside>
 
 1. 테스트 방법 - 테스트 코드 (test ~)
 
 <aside>
 💡
-
 </aside>
 
 1. 배포 (url~ )
+
+<aside>
+💡
+</aside>
+
+1. [API 문서](localhost:3000/api/docs) 
 
 <aside>
 💡
