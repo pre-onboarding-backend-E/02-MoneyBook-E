@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateUserDTO } from './dto/createUser.dto';
@@ -48,6 +52,7 @@ export class UserService {
     } catch (error) {
       return error;
     }
+  }
 
   async login(userData: LoginDto) {
     return;
