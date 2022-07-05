@@ -1,10 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { MoneyBook } from 'src/moneyBook/entities/moneyBook.entity';
 import {
   Column,
   Entity,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
   CreateDateColumn,
+  OneToMany,
 } from 'typeorm';
 
 @Entity()
@@ -38,4 +40,7 @@ export class User {
 
   // moneyBook과 1:N 관계 형성
   // @OnetoMany(() =>  )
+
+  @OneToMany(() => MoneyBook, (moneyBook) => moneyBook.user)
+  moneyBook: MoneyBook[];
 }
