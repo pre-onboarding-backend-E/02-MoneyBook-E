@@ -1,8 +1,11 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post, ValidationPipe, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+
 import { ApiBody, ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
 import { LoginDto } from 'src/user/dto/login.dto';
-import { LoginResponse } from 'src/user/entities/login.response';
+import { LoginResponse } from 'src/user/dto/login.response';
+import { CreateUserDTO } from './dto/createUser.dto';
+import { User } from './entities/user.entity';
 import { UserService } from './user.service';
 
 @ApiTags('User')
@@ -32,8 +35,10 @@ export class UserController {
   @ApiBody({ type: LoginDto })
   @ApiCreatedResponse({ description: '성공', type: LoginResponse })
   @Post('/signup')
-  async signUp() {
-    return;
+  async signUp(
+    @Body(ValidationPipe) createUserDto: CreateUserDTO,
+  ): Promise<User> {
+    return this.userService.createUSer(createUserDto);
   }
 
   // 로그아웃
