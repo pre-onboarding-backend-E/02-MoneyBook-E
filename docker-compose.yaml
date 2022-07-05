@@ -12,6 +12,7 @@ services:
       - 3000:3000
 
   database-server:
+    # platform: linux/x86_64 # mac(m1) docker에서는 1회성으로 리눅스 환경 설정
     image: mysql:5.7
     restart: always
     environment:
