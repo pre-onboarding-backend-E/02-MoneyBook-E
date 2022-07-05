@@ -1,4 +1,5 @@
-FROM node:16
+FROM node:17.2.0-alpine
+
 WORKDIR /money-book
 COPY ./package.json /money-book/
 COPY ./yarn.lock /money-book/
