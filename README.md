@@ -69,4 +69,3 @@ DB_DATABASE=money-book
 **기타**) ERD / 개발 요구사항 분석 과정 / commit Convention 등 ... 자유롭게
 
 - 사진 첨부
-- 팀원 이름 + github

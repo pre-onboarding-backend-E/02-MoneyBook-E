@@ -48,5 +48,20 @@ export class UserService {
     } catch (error) {
       return error;
     }
+
+  async login(userData: LoginDto) {
+    return;
+  }
+
+  async findUser(userData: LoginDto) {
+    const { email, password } = userData;
+    // email, password 없으면 400 Bad Request;
+
+    const user = this.userRepository.findOne({
+      where: { email: email, password: password },
+    });
+    // 존재하지 않는 유저 => 404 Not Found;
+
+    return user;
   }
 }
