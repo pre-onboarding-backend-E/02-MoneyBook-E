@@ -29,13 +29,12 @@ export class MoneyBookService {
     moneyBook.total = 0; // 추후 수정
 
     await this.moneybookRepository.save(moneyBook);
-
-    // moneyBook.type = createDto.type (enum)
   }
   public async getMoneyBook(id: number) {
-    const result = await this.moneybookRepository.find({
+    const result = await this.moneybookRepository.findOne({
       where: {
         id: id,
+        deletedAt: null,
       },
     });
     return result;
@@ -45,14 +44,7 @@ export class MoneyBookService {
     return allMoneyBooks;
   }
 
-  modifyMoneyBook(
-    id: number,
-    modifyDto: ModifyMoneyBookDto,
-  ): Promise<MoneyBook> {
-    throw new Error('Method not implemented.');
-  }
+  public async modifyMoneyBook(id: number, modifyDto: ModifyMoneyBookDto) {}
 
-  public async deleteMoneyBook(id: number) {
-    // const existMoneyBook = await this.mon
-  }
+  public async deleteMoneyBook(id: number) {}
 }

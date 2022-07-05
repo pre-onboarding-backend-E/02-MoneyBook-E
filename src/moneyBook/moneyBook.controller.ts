@@ -37,7 +37,7 @@ export class MoneyBookController {
     @Body() modifyDto: ModifyMoneyBookDto,
   ) {
     const result = this.moneybookService.modifyMoneyBook(id, modifyDto);
-    //return DefaultResponse.ok(result);
+    return result;
   }
   // updated/ delete 내역 제외. deleted=null인 것만
   @Get('')
