@@ -13,6 +13,7 @@ import { ApiCreatedResponse, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { CreateMoneyBookDto } from './dto/createMoneyBook.dto';
 import { ModifyMoneyBookDto } from './dto/modifyMoneyBook.dto';
+import { MoneyBookResponse } from './dto/moneyBookResponse';
 import { MoneyBookService } from './moneyBook.service';
 
 @ApiTags('MoneyBooks')
@@ -20,6 +21,13 @@ import { MoneyBookService } from './moneyBook.service';
 export class MoneyBookController {
   // api Response example / success / fail (feedback)
   constructor(private moneybookService: MoneyBookService) {}
+
+  @Post('')
+  @ApiCreatedResponse({ description: '성공', type: MoneyBookResponse })
+  async createOne(@Body() createDto: CreateMoneyBookDto) {
+    const result = await this.moneybookService.createMoneyBook(createDto);
+    return result;
+  }
 
   @Patch('/:id')
   async modifyOne(
@@ -41,14 +49,6 @@ export class MoneyBookController {
   async getOne(@Query('id', ParseIntPipe) id: number) {
     const result = this.moneybookService.getMoneyBook(id);
     //return DefaultResponse.ok(result);
-  }
-
-  @Post('')
-  @ApiCreatedResponse({
-    description: '가계부 생성 성공',
-  })
-  async createOne(@Body() createDto: CreateMoneyBookDto) {
-    const result = this.moneybookService.createMoneyBook(createDto);
   }
 
   // void
