@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import {
   IsEmail,
   IsString,
@@ -7,10 +8,12 @@ import {
 } from 'class-validator';
 
 export class CreateUserDTO {
+  @ApiProperty()
   @IsString()
   @IsEmail()
   readonly email: string;
 
+  @ApiProperty()
   @IsString()
   @MinLength(6, {
     message: '비밀번호는 6글자 이상이어야 합니다.',
@@ -23,6 +26,7 @@ export class CreateUserDTO {
   })
   readonly password: string;
 
+  @ApiProperty()
   @IsString()
   @MinLength(6, {
     message: '비밀번호는 6글자 이상이어야 합니다.',
