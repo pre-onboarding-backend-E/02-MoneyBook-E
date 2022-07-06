@@ -1,9 +1,12 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { LoginDto } from 'src/user/dto/login.dto';
 import { UserService } from 'src/user/user.service';
 import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcryptjs';
-import { User } from 'src/user/entities/user.entity';
 import { compare } from 'bcryptjs';
 
 @Injectable()
@@ -44,10 +47,20 @@ export class AuthService {
   }
 
   // 유저 정보를 받아 jwt 토큰 반환
-  login(user: User) {
-    const payload = { id: user.id, email: user.email };
-    const token = this.jwtService.sign(payload);
+  async login(loginDto: LoginDto): Promise<string> {
+    const { email, password } = loginDto;
+    const user = await this.userService.getUserByEmail(email);
 
-    return token;
+    if (user && (await compare(password, user.password))) {
+      const payload = { email: user.email };
+      const accessToken = await this.jwtService.sign(payload, {
+        secret: process.env.JWT_SECRET_KEY,
+        expiresIn: process.env.JWT_EXPIRATION_TIME,
+      });
+
+      return accessToken;
+    } else {
+      throw new UnauthorizedException('로그인에 실패하였습니다.');
+    }
   }
 }
