@@ -2,7 +2,6 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { LoginDto } from 'src/user/dto/login.dto';
 import { UserService } from 'src/user/user.service';
 import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcryptjs';
 import { User } from 'src/user/entities/user.entity';
 import { compare } from 'bcryptjs';
 
@@ -44,10 +43,44 @@ export class AuthService {
   }
 
   // 유저 정보를 받아 jwt 토큰 반환
-  login(user: User) {
-    const payload = { id: user.id, email: user.email };
-    const token = this.jwtService.sign(payload);
+  // async login(user: User) {
+  //   const payload = { id: user.id, email: user.email };
+  //   const token = this.jwtService.sign(payload);
+  //   return token;
+  // }
 
-    return token;
+  getCookieWithJwtAccessToken() {
+    // AccessToken 발급
+  }
+
+  getCookieWithJwtRefreshToken(id: number) {
+    // RefreshToken 발급
+    const payload = { id };
+    const token = this.jwtService.sign(payload, {
+      secret: process.env.JWT_REFRESH_TOKEN_SECRET,
+      expiresIn: `${process.env.JWT_REFRESH_TOKEN_EXPIRATION_TIME}s`,
+    });
+
+    return {
+      refreshToken: token,
+      domain: 'localhost',
+      path: '/',
+      httpOnly: true,
+      maxAge: Number(process.env.JWT_REFRESH_TOKEN_EXPIRATION_TIME) * 1000,
+    };
+  }
+
+  getCookiesForLogOut() {
+    // 로그아웃
+  }
+
+  async logOut() {
+    return {
+      token: '',
+      domain: 'localhost',
+      path: '/',
+      httpOnly: true,
+      maxAge: 0,
+    };
   }
 }
