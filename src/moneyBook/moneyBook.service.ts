@@ -1,7 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MoneyBook } from 'src/moneyBook/entities/moneyBook.entity';
-import { Repository } from 'typeorm';
+import { getConnection, Repository } from 'typeorm';
 import { CreateMoneyBookDto } from './dto/createMoneyBook.dto';
 import { ModifyMoneyBookDto } from './dto/modifyMoneyBook.dto';
 import { MoneyType } from './type/moneyBook.enum';
@@ -20,7 +24,9 @@ export class MoneyBookService {
     private moneybookRepository: Repository<MoneyBook>,
   ) {}
 
-  public async createMoneyBook(createDto: CreateMoneyBookDto) {
+  public async createMoneyBook(
+    createDto: CreateMoneyBookDto,
+  ): Promise<MoneyBook> {
     const moneyBook = new MoneyBook();
 
     moneyBook.description = createDto.description;
@@ -28,7 +34,8 @@ export class MoneyBookService {
     moneyBook.type = createDto.type == 0 ? MoneyType[0] : MoneyType[1];
     moneyBook.total = 0; // 추후 수정
 
-    await this.moneybookRepository.save(moneyBook);
+    const createdMoneyBook = await this.moneybookRepository.save(moneyBook);
+    return createdMoneyBook;
   }
   public async getMoneyBook(id: number) {
     const result = await this.moneybookRepository.findOne({
@@ -44,7 +51,38 @@ export class MoneyBookService {
     return allMoneyBooks;
   }
 
-  public async modifyMoneyBook(id: number, modifyDto: ModifyMoneyBookDto) {}
+  // update x -> key 를 빼고 보냄.
+  public async modifyMoneyBook(bookId: number, modifyDto: ModifyMoneyBookDto) {
+    if (modifyDto.hasOwnProperty('type')) {
+      const type = modifyDto.type == 0 ? MoneyType[0] : MoneyType[1];
 
-  public async deleteMoneyBook(id: number) {}
+      const modifiedMoneyBook = await this.moneybookRepository
+        .createQueryBuilder()
+        .update(MoneyBook)
+        .set({
+          money: modifyDto.money,
+          description: modifyDto.description,
+          type: type,
+        })
+        .where('id = :id', { id: bookId })
+        .execute();
+      return modifiedMoneyBook;
+    }
+    // else
+  }
+
+  public async deleteMoneyBook(bookId: number) {
+    const result = await this.moneybookRepository.findOne({
+      where: {
+        id: bookId,
+      },
+    });
+    if (result)
+      await this.moneybookRepository.softDelete({
+        id: bookId,
+      });
+    else {
+      throw NotFoundException;
+    }
+  }
 }

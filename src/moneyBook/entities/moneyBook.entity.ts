@@ -1,39 +1,48 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { User } from 'src/user/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   ManyToOne,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 
 @Entity('moneybook')
 export class MoneyBook {
+  @ApiProperty()
   @PrimaryGeneratedColumn()
   id: number;
 
   // income or outcome
+  @ApiProperty()
   @Column()
   money: number;
 
-  // type ==1 이면 income 2면 outcome / 입력은 number로 나타낼 땐 string  (enum)
+  @ApiProperty()
   @Column()
   type: string;
 
   // 총 합계
+  @ApiProperty()
   @Column()
   total: number;
 
+  @ApiProperty()
   @Column()
   description: string;
 
+  @ApiProperty()
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
 
-  @Column({ type: 'timestamp', nullable: true })
+  @ApiProperty()
+  @UpdateDateColumn({ type: 'timestamp', nullable: true })
   updatedAt: Date;
 
-  @Column({ type: 'timestamp', nullable: true })
+  @DeleteDateColumn({ type: 'timestamp', nullable: true })
   deletedAt: Date;
 
   @ManyToOne(() => User, (user) => user.moneyBook, {

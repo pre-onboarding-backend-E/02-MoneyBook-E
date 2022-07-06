@@ -2,11 +2,13 @@ import { NestFactory } from '@nestjs/core';
 import { SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { BaseAPIDocumentation } from './config/baseApiDocs';
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.setGlobalPrefix('/api');
+  app.use(cookieParser());
 
   // Swagger API Docs
   const documentOptions = new BaseAPIDocumentation().initializeOptions();

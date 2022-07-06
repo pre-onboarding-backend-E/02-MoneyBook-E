@@ -9,12 +9,14 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import { ApiCreatedResponse, ApiResponse, ApiTags } from '@nestjs/swagger';
-
+import {
+  ApiBody,
+  ApiCreatedResponse,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { CreateMoneyBookDto } from './dto/createMoneyBook.dto';
 import { ModifyMoneyBookDto } from './dto/modifyMoneyBook.dto';
-import { MoneyBookResponse } from './dto/moneyBookResponse';
-import { MoneyBook } from './entities/moneyBook.entity';
 import { MoneyBookService } from './moneyBook.service';
 
 @ApiTags('MoneyBooks')
@@ -24,11 +26,13 @@ export class MoneyBookController {
   // try catch & promise 추가
   constructor(private moneybookService: MoneyBookService) {}
 
+  //@ApiBody({ type: CreateMoneyBookDto })
   @Post('')
-  @ApiCreatedResponse({ description: '성공', type: MoneyBookResponse })
+  @ApiCreatedResponse({
+    description: 'created money book!',
+  })
   async createOne(@Body() createDto: CreateMoneyBookDto) {
-    const result = await this.moneybookService.createMoneyBook(createDto);
-    return result;
+    return this.moneybookService.createMoneyBook(createDto);
   }
 
   @Patch('/:id')
@@ -41,7 +45,7 @@ export class MoneyBookController {
   }
   // updated/ delete 내역 제외. deleted=null인 것만
   @Get('')
-  @ApiResponse({ description: '성공', type: MoneyBookResponse })
+  @ApiResponse({ description: '성공' })
   async getAll() {
     const result = await this.moneybookService.getAllMoneyBooks();
     return result;
@@ -53,9 +57,8 @@ export class MoneyBookController {
     return result;
   }
 
-  // void
   @Delete('/:id')
   async deleteOne(@Param('id', ParseIntPipe) id: number) {
-    const result = this.moneybookService.deleteMoneyBook(id);
+    await this.moneybookService.deleteMoneyBook(id);
   }
 }

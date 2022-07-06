@@ -1,6 +1,8 @@
 import {
   BadRequestException,
+  ConflictException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -48,12 +50,16 @@ export class UserService {
       email,
       password: hashedPassword,
     });
-    console.log(user);
+
     try {
       await this.userRepository.save(user);
       return user;
     } catch (error) {
-      return error;
+      if (error.errno === 1062) {
+        throw new ConflictException('해당 이메일은 이미 사용중입니다.');
+      } else {
+        throw new InternalServerErrorException();
+      }
     }
   }
 
