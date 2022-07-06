@@ -38,9 +38,9 @@ export class UserService {
   }
 
   async createUser(createUserDto: CreateUserDTO): Promise<User> {
-    const { email, password, comfirmPassword } = createUserDto;
+    const { email, password, confirmPassword } = createUserDto;
 
-    if (password !== comfirmPassword) {
+    if (password !== confirmPassword) {
       throw new BadRequestException('비밀번호가 서로 일치하지 않습니다.');
     }
 
