@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MoneyBook } from 'src/moneyBook/entities/moneyBook.entity';
-import { getConnection, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { CreateMoneyBookDto } from './dto/createMoneyBook.dto';
 import { ModifyMoneyBookDto } from './dto/modifyMoneyBook.dto';
 import { MoneyType } from './type/moneyBook.enum';
@@ -32,7 +32,15 @@ export class MoneyBookService {
     moneyBook.description = createDto.description;
     moneyBook.money = createDto.money;
     moneyBook.type = createDto.type == 0 ? MoneyType[0] : MoneyType[1];
-    moneyBook.total = 0; // 추후 수정
+
+    // - 일 경우에도 합계에 - 나오게끔 처리
+    let sum = 0;
+    if (moneyBook.type == 'income') {
+      sum += createDto.money;
+    } else {
+      sum -= createDto.money;
+    }
+    moneyBook.total = sum;
 
     const createdMoneyBook = await this.moneybookRepository.save(moneyBook);
     return createdMoneyBook;
@@ -52,6 +60,7 @@ export class MoneyBookService {
   }
 
   // update x -> key 를 빼고 보냄.
+  // 현재 user 정보 mapping
   public async modifyMoneyBook(bookId: number, modifyDto: ModifyMoneyBookDto) {
     if (modifyDto.hasOwnProperty('type')) {
       const type = modifyDto.type == 0 ? MoneyType[0] : MoneyType[1];
@@ -66,6 +75,7 @@ export class MoneyBookService {
         })
         .where('id = :id', { id: bookId })
         .execute();
+
       return modifiedMoneyBook;
     }
     // else
