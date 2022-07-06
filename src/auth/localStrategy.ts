@@ -4,14 +4,12 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 
 // Passport 전략의 동작을 사용자화합니다.
-// passport-local의 사용 사례에는 구성 옵션이 없으므로 생성자 supe()은 옵션 객체 없이 단순히 호출합니다.
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
   constructor(private authService: AuthService) {
     super({
       usernameField: 'email',
       passwordField: 'password',
-      passReqToCallback: false,
     });
   }
 
