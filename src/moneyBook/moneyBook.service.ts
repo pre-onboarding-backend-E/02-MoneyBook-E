@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MoneyBook } from 'src/moneyBook/entities/moneyBook.entity';
-import { Repository } from 'typeorm';
+import { getConnection, Repository } from 'typeorm';
 import { CreateMoneyBookDto } from './dto/createMoneyBook.dto';
 import { ModifyMoneyBookDto } from './dto/modifyMoneyBook.dto';
 import { MoneyType } from './type/moneyBook.enum';
@@ -51,22 +51,24 @@ export class MoneyBookService {
     return allMoneyBooks;
   }
 
-  public async modifyMoneyBook(id: number, modifyDto: ModifyMoneyBookDto) {
-    // try {
-    //   const modifyDTO = new ModifyMoneyBookDto();
-    //   if (modifyDTO.hasOwnProperty('type')) {
-    //     const type = modifyDTO.type == 0 ? MoneyType[0] : MoneyType[1];
-    //   } else {
-    //     const modifedResult = await this.moneybookRepository.update(
-    //       id,
-    //       modifyDto,
-    //     );
-    //   }
-    //   return modifedResult;
-    // } catch (error) {
-    //   console.log(error);
-    //   throw BadRequestException;
-    // }
+  // update x -> key 를 빼고 보냄.
+  public async modifyMoneyBook(bookId: number, modifyDto: ModifyMoneyBookDto) {
+    if (modifyDto.hasOwnProperty('type')) {
+      const type = modifyDto.type == 0 ? MoneyType[0] : MoneyType[1];
+
+      const modifiedMoneyBook = await this.moneybookRepository
+        .createQueryBuilder()
+        .update(MoneyBook)
+        .set({
+          money: modifyDto.money,
+          description: modifyDto.description,
+          type: type,
+        })
+        .where('id = :id', { id: bookId })
+        .execute();
+      return modifiedMoneyBook;
+    }
+    // else
   }
 
   public async deleteMoneyBook(bookId: number) {
