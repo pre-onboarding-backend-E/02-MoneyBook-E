@@ -14,12 +14,14 @@ import { ApiCreatedResponse, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateMoneyBookDto } from './dto/createMoneyBook.dto';
 import { ModifyMoneyBookDto } from './dto/modifyMoneyBook.dto';
 import { MoneyBookResponse } from './dto/moneyBookResponse';
+import { MoneyBook } from './entities/moneyBook.entity';
 import { MoneyBookService } from './moneyBook.service';
 
 @ApiTags('MoneyBooks')
 @Controller('moneybooks')
 export class MoneyBookController {
   // api Response example / success / fail (feedback)
+  // try catch & promise 추가
   constructor(private moneybookService: MoneyBookService) {}
 
   @Post('')
@@ -35,20 +37,20 @@ export class MoneyBookController {
     @Body() modifyDto: ModifyMoneyBookDto,
   ) {
     const result = this.moneybookService.modifyMoneyBook(id, modifyDto);
-    //return DefaultResponse.ok(result);
+    return result;
   }
+  // updated/ delete 내역 제외. deleted=null인 것만
   @Get('')
-  @ApiResponse({
-    description: '목록 조회 성공',
-  })
+  @ApiResponse({ description: '성공', type: MoneyBookResponse })
   async getAll() {
-    const result = this.moneybookService.getAllMoneyBooks();
+    const result = await this.moneybookService.getAllMoneyBooks();
+    return result;
   }
 
   @Get('/:id')
   async getOne(@Query('id', ParseIntPipe) id: number) {
     const result = this.moneybookService.getMoneyBook(id);
-    //return DefaultResponse.ok(result);
+    return result;
   }
 
   // void

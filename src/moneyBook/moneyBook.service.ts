@@ -29,24 +29,22 @@ export class MoneyBookService {
     moneyBook.total = 0; // 추후 수정
 
     await this.moneybookRepository.save(moneyBook);
-
-    // moneyBook.type = createDto.type (enum)
   }
-  getMoneyBook(id: number): Promise<MoneyBook> {
-    throw new Error('Method not implemented.');
+  public async getMoneyBook(id: number) {
+    const result = await this.moneybookRepository.findOne({
+      where: {
+        id: id,
+        deletedAt: null,
+      },
+    });
+    return result;
   }
-  getAllMoneyBooks(): Promise<MoneyBook[]> {
-    throw new Error('Method not implemented.');
-  }
-
-  modifyMoneyBook(
-    id: number,
-    modifyDto: ModifyMoneyBookDto,
-  ): Promise<MoneyBook> {
-    throw new Error('Method not implemented.');
+  public async getAllMoneyBooks(): Promise<MoneyBook[]> {
+    const allMoneyBooks = await this.moneybookRepository.find();
+    return allMoneyBooks;
   }
 
-  deleteMoneyBook(id: number) {
-    throw new Error('Method not implemented.');
-  }
+  public async modifyMoneyBook(id: number, modifyDto: ModifyMoneyBookDto) {}
+
+  public async deleteMoneyBook(id: number) {}
 }
