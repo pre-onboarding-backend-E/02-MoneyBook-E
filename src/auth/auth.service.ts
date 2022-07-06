@@ -5,10 +5,9 @@ import { compare } from 'bcryptjs';
 
 @Injectable()
 export class AuthService {
-  // 유저가 존재하는지 확인한다.
-  // JWT 생성을 다룬다.
   constructor(private userService: UserService) {}
 
+  // 유저가 존재하는지 확인합니다.
   async validateUser(payload: LoginDto): Promise<any> {
     try {
       const { password, email } = payload;
@@ -23,7 +22,7 @@ export class AuthService {
     }
   }
 
-  // 비밀번호가 일치하는지 확인한다.
+  // 비밀번호가 일치하는지 확인합니다.
   private async verityPassword(
     plainTextPassword: string,
     hashedPassword: string,
