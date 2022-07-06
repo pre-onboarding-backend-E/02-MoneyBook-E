@@ -34,7 +34,7 @@ export class UserService {
     return user;
   }
 
-  async createUSer(createUserDto: CreateUserDTO): Promise<User> {
+  async createUser(createUserDto: CreateUserDTO): Promise<User> {
     const { email, password, comfirmPassword } = createUserDto;
 
     if (password !== comfirmPassword) {
@@ -42,9 +42,12 @@ export class UserService {
     }
 
     const salt = await bcrypt.genSalt();
-    const hashedPasswod = await bcrypt.hash(password, salt);
+    const hashedPassword = await bcrypt.hash(password, salt);
 
-    const user = this.userRepository.create({ email, password: hashedPasswod });
+    const user = this.userRepository.create({
+      email,
+      password: hashedPassword,
+    });
     console.log(user);
     try {
       await this.userRepository.save(user);
@@ -54,19 +57,10 @@ export class UserService {
     }
   }
 
-  async login(userData: LoginDto) {
-    return;
-  }
-
-  async findUser(userData: LoginDto) {
+  async findUser(userData: LoginDto): Promise<User | undefined> {
     const { email, password } = userData;
-    // email, password 없으면 400 Bad Request;
-
-    const user = this.userRepository.findOne({
+    return this.userRepository.findOne({
       where: { email: email, password: password },
     });
-    // 존재하지 않는 유저 => 404 Not Found;
-
-    return user;
   }
 }
