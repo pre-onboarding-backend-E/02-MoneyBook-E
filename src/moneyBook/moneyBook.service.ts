@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MoneyBook } from 'src/moneyBook/entities/moneyBook.entity';
 import { Repository } from 'typeorm';
@@ -20,7 +24,9 @@ export class MoneyBookService {
     private moneybookRepository: Repository<MoneyBook>,
   ) {}
 
-  public async createMoneyBook(createDto: CreateMoneyBookDto) {
+  public async createMoneyBook(
+    createDto: CreateMoneyBookDto,
+  ): Promise<MoneyBook> {
     const moneyBook = new MoneyBook();
 
     moneyBook.description = createDto.description;
@@ -28,7 +34,8 @@ export class MoneyBookService {
     moneyBook.type = createDto.type == 0 ? MoneyType[0] : MoneyType[1];
     moneyBook.total = 0; // 추후 수정
 
-    await this.moneybookRepository.save(moneyBook);
+    const createdMoneyBook = await this.moneybookRepository.save(moneyBook);
+    return createdMoneyBook;
   }
   public async getMoneyBook(id: number) {
     const result = await this.moneybookRepository.findOne({
@@ -44,7 +51,36 @@ export class MoneyBookService {
     return allMoneyBooks;
   }
 
-  public async modifyMoneyBook(id: number, modifyDto: ModifyMoneyBookDto) {}
+  public async modifyMoneyBook(id: number, modifyDto: ModifyMoneyBookDto) {
+    // try {
+    //   const modifyDTO = new ModifyMoneyBookDto();
+    //   if (modifyDTO.hasOwnProperty('type')) {
+    //     const type = modifyDTO.type == 0 ? MoneyType[0] : MoneyType[1];
+    //   } else {
+    //     const modifedResult = await this.moneybookRepository.update(
+    //       id,
+    //       modifyDto,
+    //     );
+    //   }
+    //   return modifedResult;
+    // } catch (error) {
+    //   console.log(error);
+    //   throw BadRequestException;
+    // }
+  }
 
-  public async deleteMoneyBook(id: number) {}
+  public async deleteMoneyBook(bookId: number) {
+    const result = await this.moneybookRepository.findOne({
+      where: {
+        id: bookId,
+      },
+    });
+    if (result)
+      await this.moneybookRepository.softDelete({
+        id: bookId,
+      });
+    else {
+      throw NotFoundException;
+    }
+  }
 }
