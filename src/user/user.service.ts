@@ -57,10 +57,9 @@ export class UserService {
     }
   }
 
-  async findUser(userData: LoginDto): Promise<User | undefined> {
-    const { email, password } = userData;
+  async getUserByEmail(email: string): Promise<User | undefined> {
     return this.userRepository.findOne({
-      where: { email: email, password: password },
+      where: { email: email },
     });
   }
 }
