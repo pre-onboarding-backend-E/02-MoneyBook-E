@@ -4,15 +4,16 @@ import {
   Post,
   ValidationPipe,
   UseGuards,
-  Request,
   Res,
   Get,
   Req,
 } from '@nestjs/common';
-import { ApiBody, ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
-import { AuthService } from 'src/auth/auth.service';
 import { JwtRefreshGuard } from 'src/auth/passport/Guard/jwtRefreshGuard';
 import { LocalAuthGuard } from 'src/auth/passport/Guard/localAuthGuard';
+import { ApiBody, ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
+import { Response } from 'express';
+import { AuthService } from 'src/auth/auth.service';
+import { Public } from 'src/common/skipAuthDecorator';
 import { LoginDto } from 'src/user/dto/login.dto';
 import { LoginResponse } from 'src/user/dto/login.response';
 import { CreateUserDTO } from './dto/createUser.dto';
@@ -26,37 +27,40 @@ export class UserController {
     private readonly userService: UserService,
     private readonly authService: AuthService,
   ) {}
-  // 회원가입_테스트
-  @ApiBody({ type: LoginDto })
-  @ApiCreatedResponse({ description: '성공', type: LoginResponse })
-  @Post('/signup/one')
-  async signUpOne(@Body() userData: LoginDto): Promise<object> {
-    const result = await this.userService.createTestUser(userData);
-    return result;
-  }
 
   // 로그인
   @ApiBody({ type: LoginDto })
   @ApiCreatedResponse({ description: '성공', type: LoginResponse })
-  @UseGuards(LocalAuthGuard)
   @Post('/login')
-  async login(@Request() req, @Res({ passthrough: true }) res: Response) {
-    const user = req.user;
+  // async login(@Request() req, @Res({ passthrough: true }) res: Response) {
+  //   const user = req.user;
 
-    // 액세스 토큰 발급 요청
-    // ----
+  //   // 액세스 토큰 발급 요청
+  //   // ----
 
-    // 리프레스 토큰 발급
-    const { refreshToken, ...refreshOption } =
-      this.authService.getCookieWithJwtRefreshToken(user.id);
-    await this.userService.setCurrentRefreshToken(refreshToken, user.id);
+  //   // 리프레스 토큰 발급
+  //   const { refreshToken, ...refreshOption } =
+  //     this.authService.getCookieWithJwtRefreshToken(user.id);
+  //   await this.userService.setCurrentRefreshToken(refreshToken, user.id);
 
-    // 액세스 토큰 전달
-    // ----
+  //   // 액세스 토큰 전달
+  //   // ----
 
-    // 리프레스 토큰 전달
-    res.cookie('Refresh', refreshToken, refreshOption);
-    return req.user;
+  //   // 리프레스 토큰 전달
+  //   res.cookie('Refresh', refreshToken, refreshOption);
+  //   return req.user;
+  // }
+  async login(
+    @Body() loginDto: LoginDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const token = await this.authService.login(loginDto);
+
+    res.cookie('Authentication', token, {
+      domain: 'localhost',
+      path: '/',
+      httpOnly: true,
+    });
   }
 
   // 회원 가입
