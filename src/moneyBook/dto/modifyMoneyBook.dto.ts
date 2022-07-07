@@ -1,6 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber } from 'class-validator';
-import { CreateMoneyBookDto } from './createMoneyBook.dto';
 
 export class ModifyMoneyBookDto {
   @ApiProperty({ description: ' 금액', example: 15000 })
