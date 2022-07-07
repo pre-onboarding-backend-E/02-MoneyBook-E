@@ -9,7 +9,12 @@ import {
   Req,
 } from '@nestjs/common';
 import { JwtRefreshGuard } from 'src/auth/passport/guard/jwtRefreshGuard';
-import { ApiBody, ApiCreatedResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiCreatedResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Response } from 'express';
 import { AuthService } from 'src/auth/auth.service';
 import { LoginDto } from 'src/user/dto/login.dto';
@@ -18,6 +23,7 @@ import { CreateUserDTO } from './dto/createUser.dto';
 import { User } from './entities/user.entity';
 import { UserService } from './user.service';
 import { LocalAuthGuard } from 'src/auth/passport/guard/localAuthGuard';
+import { GetUser } from 'src/common/getUserDecorator';
 
 @ApiTags('User')
 @Controller('users')
@@ -56,11 +62,11 @@ export class UserController {
     await this.userService.setCurrentRefreshToken(refreshToken, email);
     res.cookie('Authentication', accessToken, accessOption);
     res.cookie('Refresh', refreshToken, refreshOption);
-    return;
+    return accessToken;
   }
 
   // 회원 가입
-  @ApiBody({ type: LoginDto })
+  @ApiBody({ type: CreateUserDTO })
   @ApiCreatedResponse({ description: '성공', type: LoginResponse })
   @Post('/signup')
   async signUp(
@@ -69,22 +75,28 @@ export class UserController {
     return this.userService.createUser(createUserDto);
   }
 
-  // 로그아웃;
+  // 로그아웃
+  @ApiBearerAuth('access-token')
   @ApiCreatedResponse({ description: '성공' })
   @UseGuards(JwtRefreshGuard)
   @Post('/logout')
-  async logout(@Req() req, @Res({ passthrough: true }) res: Response) {
+  async logout(
+    @Req() req,
+    @Res({ passthrough: true }) res: Response,
+    @GetUser() user: User,
+  ) {
     const { accessOption, refreshOption } =
       this.authService.getCookiesForLogOut();
     await this.userService.removeRefreshToken(req.user.id);
     res.cookie('Authentication', '', accessOption);
     res.cookie('Refresh', '', refreshOption);
 
-    return;
+    return user;
   }
 
   // 리프레시 토큰으로 액세스 토큰 재요청
   @UseGuards(JwtRefreshGuard)
+  @ApiBearerAuth('access-token')
   @Get('/refresh')
   async refresh(@Req() req, @Res({ passthrough: true }) res: Response) {
     const user = req.user;

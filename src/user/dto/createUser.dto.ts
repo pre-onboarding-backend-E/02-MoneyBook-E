@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
   IsEmail,
+  IsNotEmpty,
   IsString,
   Matches,
   MaxLength,
@@ -8,34 +9,35 @@ import {
 } from 'class-validator';
 
 export class CreateUserDTO {
-  @ApiProperty()
+  @ApiProperty({ description: '이메일', example: 'test@mail.com' })
   @IsString()
   @IsEmail()
+  @IsNotEmpty()
   readonly email: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: '비밀번호 (6~20글자 영문/숫자)',
+    example: 'password1234',
+  })
   @IsString()
-  @MinLength(6, {
-    message: '비밀번호는 6글자 이상이어야 합니다.',
-  })
-  @MaxLength(20, {
-    message: '비밀번호는 최대 20글자입니다.',
-  })
+  @MinLength(6)
+  @MaxLength(20)
   @Matches(/^[a-zA-Z0-9]*$/, {
-    message: '비밀번호는 영문과 숫자만 가능합니다.',
+    message: '비밀번호는 6~20글자에 영문과 숫자만 가능합니다.',
   })
+  @IsNotEmpty()
   readonly password: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: '비밀번호 확인 (6~20글자 영문/숫자)',
+    example: 'password1234',
+  })
   @IsString()
-  @MinLength(6, {
-    message: '비밀번호는 6글자 이상이어야 합니다.',
-  })
-  @MaxLength(20, {
-    message: '비밀번호는 최대 20글자입니다.',
-  })
+  @MinLength(6)
+  @MaxLength(20)
   @Matches(/^[a-zA-Z0-9]*$/, {
-    message: '비밀번호는 영문과 숫자만 가능합니다.',
+    message: '비밀번호는 6~20글자에 영문과 숫자만 가능합니다.',
   })
+  @IsNotEmpty()
   readonly confirmPassword: string;
 }
