@@ -24,7 +24,7 @@ import { JwtAuthGuard } from './auth/passport/guard/jwtAuthGuard';
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
       entities: ['dist/**/*.entity.{ts,js}'],
-      synchronize: true,
+      synchronize: false,
       logging: true,
       retryAttempts: 30,
       retryDelay: 5000,
