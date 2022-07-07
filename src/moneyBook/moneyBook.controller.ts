@@ -26,8 +26,8 @@ import { ModifyMoneyBookDto } from './dto/modifyMoneyBook.dto';
 import { DefaultResponse } from './dto/moneyBook.response';
 import { MoneyBookService } from './moneyBook.service';
 
-@ApiTags('MoneyBooks')
-@Controller('moneybooks')
+@ApiTags('AccountBooks')
+@Controller('accountBooks')
 @ApiBearerAuth('access_token')
 @UseGuards(AuthGuard('jwt'))
 export class MoneyBookController {
@@ -87,7 +87,7 @@ export class MoneyBookController {
 
   @Patch('/:id/restore')
   @ApiBearerAuth('access_token')
-  @ApiCreatedResponse({
+  @ApiResponse({
     description: MSG.restoreOne.msg,
     type: DefaultResponse,
   })

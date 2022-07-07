@@ -1,5 +1,5 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable prettier/prettier */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   BadRequestException,
   Injectable,
@@ -7,10 +7,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ErrorType } from 'src/common/error.enum';
-import { DefaultError } from 'src/common/error.response';
 import { GetUser } from 'src/common/getUserDecorator';
-import { HttpErrorType } from 'src/common/httpError.type';
 import { MoneyBook } from 'src/moneyBook/entities/moneyBook.entity';
 import { User } from 'src/user/entities/user.entity';
 import { Repository } from 'typeorm';
@@ -23,8 +20,8 @@ export class MoneyBookService {
   /* 
     작성자 : 염하늘
       - CRRUD 로직 구현
-    부작성자 : 
-      - 
+    부작성자 : 김용민
+      - Restore 로직 구현
   */
   constructor(
     @InjectRepository(MoneyBook)
@@ -41,45 +38,25 @@ export class MoneyBookService {
       },
     });
     if (result) {
-      console.log('기존 가계부 정보', result);
       return result;
     } else {
-      throw DefaultError.error(
-        ErrorType.accountNotFound.code,
-        ErrorType.accountNotFound.msg,
-      );
+      throw new NotFoundException('존재하지 않는 내역입니다.');
     }
   }
-
-  // 가계부 total
-  public async totalMoney(type: number, dto: any) {
-    let sum = 0;
-    if (type == 0) {
-      sum += dto.money;
-      return sum;
-    } else {
-      sum -= dto.money;
-      return sum;
-    }
-  }
-  // 로그인한 유저가 작성한 가계부 내역 중 가장 최신의 정보을 불러옴. (total)
+  // 로그인한 유저가 작성한 가계부 내역 중 가장 최신의 정보을 불러옴. 
   public async latestMoneyBook(@GetUser() user: User) {
     const latestResult = await this.moneybookRepository.findOne({
       where: {
         user: user.id,
         deletedAt: null,
       },
-      order : {   
-        // 수정한 게 없다면 created at 기준이고 수정했다면 updated at기준으로 가져와짐.
-        // 다 포함해서 가장 빠른 걸 가져와야 함.
-        updatedAt:'DESC' , createdAt:'DESC'
-      }
+      order: {
+        updatedAt: 'DESC',
+        createdAt: 'DESC',
+      },
     });
-    if (latestResult){
-      console.log('가장 최근 내역',latestResult)
-      return latestResult
-    } else {
-      throw new NotFoundException()
+    if (latestResult) {
+      return latestResult;
     }
   }
   // 유저가 가계부를 생성함.
@@ -93,18 +70,14 @@ export class MoneyBookService {
     moneyBook.money = createDto.money;
     moneyBook.type = createDto.type == 0 ? MoneyType[0] : MoneyType[1];
     moneyBook.user = user.id;
-    const fixedMoney = createDto.type == 0 ? moneyBook.money : -(moneyBook.money)
+    const fixedMoney = createDto.type == 0 ? moneyBook.money : -moneyBook.money;
 
     const latestTotal = await this.latestMoneyBook(user);
-    if (latestTotal){
-      moneyBook.total = latestTotal.total + fixedMoney
-      console.log(111,moneyBook.total)
+    if (latestTotal) {
+      moneyBook.total = latestTotal.total + fixedMoney;
     } else {
       moneyBook.total = fixedMoney;
     }
-    // 기존 유저가 생성한 가계부가 있으면 해당 total을 불러옴.
-    //  가장 최근 꺼 하나 불러오는 로직 필요
-
     const createdMoneyBook = await this.moneybookRepository.save(moneyBook);
     return createdMoneyBook;
   }
@@ -116,17 +89,20 @@ export class MoneyBookService {
       return result;
     } catch (error) {
       if (error) {
-        throw new BadRequestException();
+        throw new NotFoundException('존재하지 않는 내역입니다.');
       } else {
         throw new InternalServerErrorException(); // handling 해야 함. 가려야 함.
       }
     }
   }
-   // 유저가 작성한 가계부 목록 (내역) 조회
+  // 유저가 작성한 가계부 목록 (내역) 최신 순으로 조회
   public async getAllMoneyBooks(@GetUser() user: User): Promise<MoneyBook[]> {
     const allMoneyBooks = await this.moneybookRepository.find({
       where: {
         user: user.id,
+      },
+      order: {
+        createdAt: 'DESC',
       },
     });
     return allMoneyBooks;
@@ -141,14 +117,20 @@ export class MoneyBookService {
   ) {
     try {
       if (modifyDto.hasOwnProperty('type')) {
+
         const type = modifyDto.type == 0 ? MoneyType[0] : MoneyType[1];
+        const fixedMoney = modifyDto.type == 0 ? modifyDto.money : -modifyDto.money;
 
-        const sumResult = Number(
-          this.totalMoney(modifyDto.type, modifyDto.money),
-        );
+        // 존재하는지 확인
+        await this.existMoneyBook(bookId, user);
 
-        const oldResult = await this.existMoneyBook(bookId, user);
-        const newTotal = sumResult + oldResult.total;
+        let newTotal = 0;
+        const latestTotal = await this.latestMoneyBook(user);
+        if (latestTotal) {
+          newTotal = latestTotal.total + fixedMoney;
+        } else {
+          newTotal = fixedMoney;
+        }
 
         await this.moneybookRepository
           .createQueryBuilder()
@@ -167,7 +149,7 @@ export class MoneyBookService {
       }
     } catch (error) {
       if (error) {
-        throw DefaultError.error(HttpErrorType.BAD_REQUEST);
+        throw new BadRequestException();
       }
     }
   }
@@ -181,16 +163,17 @@ export class MoneyBookService {
       });
       return bookId;
     } else {
-      throw NotFoundException;
+      throw new NotFoundException('존재하지 않는 내역입니다.');
     }
   }
 
+  // 유저가 삭제한 가계부 내역 복구
   public async restoreMoneyBook(id: number): Promise<MoneyBook> {
-    const accountBook = await this.moneybookRepository.findOne({ 
-      where: { id }, 
-      withDeleted: true, 
+    const accountBook = await this.moneybookRepository.findOne({
+      where: { id },
+      withDeleted: true,
     });
-    
+
     if (!accountBook) {
       throw new NotFoundException('존재하지 않는 내역입니다.');
     }

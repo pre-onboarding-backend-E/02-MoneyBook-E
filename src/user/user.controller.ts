@@ -40,7 +40,7 @@ export class UserController {
 
   // 로그인
   @ApiBody({ type: LoginDto })
-  @ApiCreatedResponse({ description: MSG.loginUser.msg, type: UserResponse })
+  @ApiCreatedResponse({ description: MSG.loginUser.msg })
   @UseGuards(LocalAuthGuard)
   @Post('/login')
   async login(
@@ -49,7 +49,7 @@ export class UserController {
   ) {
     const { email } = userData;
     const accessToken = await this.authService.getJwtAccessToken(email);
-    console.log(accessToken);
+   // console.log(accessToken);
     const accessOption = {
       domain: 'localhost',
       path: '/',
