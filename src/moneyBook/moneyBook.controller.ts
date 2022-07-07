@@ -39,48 +39,44 @@ export class MoneyBookController {
   constructor(private moneybookService: MoneyBookService) {}
 
   @Post('')
- // @ApiBearerAuth('access-token')
   @ApiCreatedResponse({
     description: MSG.createOne.msg,
     type: DefaultResponse,
   })
 
-  async createOne(@Body() createDto: CreateMoneyBookDto,@GetUser('userId') userId : User) {
-    const result = await this.moneybookService.createMoneyBook(createDto,userId);
+  async createOne(@Body() createDto: CreateMoneyBookDto,@GetUser() user : User) {
+    const result = await this.moneybookService.createMoneyBook(createDto,user);
     return DefaultResponse.response(result, MSG.createOne.code, MSG.createOne.msg);
   }
 
   @Patch('/:id')
-  //@ApiBearerAuth('access-token')
   @ApiResponse({
-    description: MSG.modifyOne.msg,
+    description: MSG.modifyOne.msg, 
     type: DefaultResponse,
   })
   async modifyOne(
     @Param('id', ParseIntPipe) id: number,
-    @Body() modifyDto: ModifyMoneyBookDto, @GetUser('userId') userId : User
+    @Body() modifyDto: ModifyMoneyBookDto, @GetUser() user : User
   ) {
-    const result = await this.moneybookService.modifyMoneyBook(id, modifyDto,userId);
+    const result = await this.moneybookService.modifyMoneyBook(id, modifyDto,user);
     return DefaultResponse.response(result, MSG.modifyOne.code, MSG.modifyOne.msg);
   }
 
   @Get('')
- // @ApiBearerAuth('access-token')
   @ApiResponse({
     description: MSG.getAll.msg,
   })
-  async getAll(@GetUser() user : User) {
+  async getAll(@GetUser() user : User ) {
     const result = await this.moneybookService.getAllMoneyBooks(user);
     return  DefaultResponse.response(result, MSG.getAll.code, MSG.getAll.msg);
   }
 
   @Get('/:id')
-  //@ApiBearerAuth('access-token')
   @ApiResponse({
     description: MSG.getOne.msg,
   })
-  async getOne(@Query('id', ParseIntPipe) id: number, @GetUser() userId : User) {
-    const result = await this.moneybookService.getMoneyBook(id, userId);
+  async getOne(@Query('id', ParseIntPipe) id: number, @GetUser() user : User) {
+    const result = await this.moneybookService.getMoneyBook(id, user);
     return DefaultResponse.response(result, MSG.getOne.code, MSG.getOne.msg);
   }
 
@@ -88,8 +84,8 @@ export class MoneyBookController {
   @ApiResponse({
     description: MSG.deleteOne.msg,
   })
-  async deleteOne(@Param('id', ParseIntPipe) id: number) {
-   const result = await this.moneybookService.deleteMoneyBook(id);
+  async deleteOne(@Param('id', ParseIntPipe) id: number, @GetUser() user : User) {
+   const result = await this.moneybookService.deleteMoneyBook(id, user);
    return DefaultResponse.response(result, MSG.deleteOne.code, MSG.deleteOne.msg);
   }
 }

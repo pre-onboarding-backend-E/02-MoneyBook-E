@@ -11,7 +11,7 @@ export class CreateMoneyBookDto {
   @IsNumber()
   //@Matches(/[^0-1]/)
   @ApiProperty({
-    description: ' income or outcome',
+    description: ' 0을 입력하면 수입 (income) / 1을 입력하면 지출 (outcome)',
     example: 0,
   })
   type: number;
