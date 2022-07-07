@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { ApiProperty } from '@nestjs/swagger';
 import { User } from 'src/user/entities/user.entity';
 import {
@@ -49,5 +50,5 @@ export class MoneyBook {
     nullable: true,
     createForeignKeyConstraints: false,
   })
-  user: User;
+  user: number;
 }

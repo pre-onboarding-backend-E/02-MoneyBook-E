@@ -26,9 +26,12 @@ import { UserService } from './user.service';
 import { LocalAuthGuard } from 'src/auth/passport/guard/localAuthGuard';
 import { GetUser } from 'src/common/getUserDecorator';
 import { MSG } from 'src/common/response.enum';
+import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('User')
 @Controller('users')
+// @ApiBearerAuth('access_token')
+// @UseGuards(AuthGuard('jwt'))
 export class UserController {
   constructor(
     private readonly userService: UserService,
@@ -80,7 +83,7 @@ export class UserController {
   }
 
   // 로그아웃
-  @ApiBearerAuth('access-token')
+  @ApiBearerAuth('access_token')
   @ApiCreatedResponse({ description: '성공' })
   @UseGuards(JwtRefreshGuard)
   @Post('/logout')
@@ -101,7 +104,7 @@ export class UserController {
 
   // 리프레시 토큰으로 액세스 토큰 재요청
   @UseGuards(JwtRefreshGuard)
-  @ApiBearerAuth('access-token')
+  @ApiBearerAuth('access_token')
   @Get('/refresh')
   async refresh(@Req() req, @Res({ passthrough: true }) res: Response) {
     const user = req.user;
