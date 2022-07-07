@@ -1,7 +1,7 @@
+/* eslint-disable prettier/prettier */
 import {
   BadRequestException,
   Injectable,
-  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -73,6 +73,21 @@ export class MoneyBookService {
       if (modifyDto.hasOwnProperty('type')) {
         const type = modifyDto.type == 0 ? MoneyType[0] : MoneyType[1];
 
+        let sum = 0;
+        if (type == 'income') {
+          sum += modifyDto.money;
+        } else {
+          sum -= modifyDto.money;
+        }
+
+        const oldresult = await this.moneybookRepository.findOne({
+          where: {
+            id: bookId,
+          },
+        });
+        console.log(111,oldresult)
+        const newTotal = sum + oldresult.total
+
         await this.moneybookRepository
           .createQueryBuilder()
           .update(MoneyBook)
@@ -80,6 +95,7 @@ export class MoneyBookService {
             money: modifyDto.money,
             description: modifyDto.description,
             type: type,
+            total: newTotal,
           })
           .where('id = :id', { id: bookId })
           .execute();
@@ -113,3 +129,8 @@ export class MoneyBookService {
     }
   }
 }
+// To do
+// user 매핑
+//-
+// sum과 find 로직 따로 뺄 것 (리팩토링 시)
+// error 처리 (추후 고려)

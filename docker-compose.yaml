@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: Dockerfile
     volumes:
-      - ./env:/money-book/env
+      - ./env/.env:/money-book/env/.env
       - ./src:/money-book/src
     ports:
       - 3000:3000
