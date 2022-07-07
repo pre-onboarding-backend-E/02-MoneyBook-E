@@ -86,8 +86,24 @@
       "^.+\\.(t|j)s$": "ts-jest"
     },
     "collectCoverageFrom": [
-      "**/*.(t|j)s"
+      "**/*.{js,jsx}",
+      "**/*.{ts}",
+      "!**/node_modules/**",
+      "!**/vendor/**"
     ],
+    "moduleNameMapper": {
+      "^src/(.*)$": "<rootDir>/$1"
+    },
+    "roots": [
+      "<rootDir>"
+    ],
+    "modulePaths": [
+      "<rootDir>"
+    ],
+    "moduleDirectories": [
+      "node_modules"
+    ],
+    "verbose": true,
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
   }
