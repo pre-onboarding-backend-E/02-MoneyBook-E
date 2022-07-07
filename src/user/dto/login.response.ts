@@ -7,11 +7,20 @@ export abstract class LoginResponseData {
   user: User;
 }
 
-export abstract class LoginResponse extends BaseResponse {
+export class UserResponse extends BaseResponse {
   constructor() {
     super();
   }
 
   @ApiProperty()
   data: LoginResponseData;
+
+  public static response(data: any, statusCode?: number, message?: string) {
+    const response = new UserResponse();
+    response.data = data;
+    response.message = message;
+    response.statusCode = statusCode || 200;
+
+    return response;
+  }
 }
