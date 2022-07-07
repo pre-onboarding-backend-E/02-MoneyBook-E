@@ -128,6 +128,26 @@ export class MoneyBookService {
       throw NotFoundException;
     }
   }
+
+  public async restoreMoneyBook(id: number): Promise<MoneyBook> {
+    const accountBook = await this.moneybookRepository.findOne({ 
+      where: { id }, 
+      withDeleted: true, 
+    });
+    
+    if (!accountBook) {
+      throw new NotFoundException('존재하지 않는 내역입니다.');
+    }
+
+    if (accountBook.deletedAt === null) {
+      throw new BadRequestException('삭제되지 않은 내역입니다.');
+    }
+
+    accountBook.deletedAt = null;
+    await this.moneybookRepository.save(accountBook);
+
+    return accountBook;
+  }
 }
 // To do
 // user 매핑

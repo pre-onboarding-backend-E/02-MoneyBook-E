@@ -9,4 +9,5 @@ export const MSG = {
   getOne: { code: 200, msg: '가계부 상세 조회에 성공했습니다!' },
   modifyOne: { code: 200, msg: '가계부 수정 성공에 성공했습니다!' },
   deleteOne: { code: 200, msg: '가계부 삭제 성공에 성공했습니다!' },
+  restoreOne: { code: 200, msg: '가계부 복구에 성공했습니다!' },
 };
