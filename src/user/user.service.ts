@@ -13,8 +13,14 @@ import { User } from './entities/user.entity';
 import * as bcrypt from 'bcryptjs';
 import { compare } from 'bcryptjs';
 
-// UsersService- email및 password로 검색하는 find 메소드
-// 사용자 모델 및 지속성 계층을 구축합니다.
+/* 
+    작성자 : 김용민, 박신영
+    부작성자 : 염하늘, 김태영
+    
+    UsersService- email및 password로 검색하는 find 메소드
+    사용자 모델 및 지속성 계층을 구축합니다.
+  */
+
 @Injectable()
 export class UserService {
   constructor(
@@ -68,7 +74,7 @@ export class UserService {
   }
 
   async getUserRefreshTokenMatches(refreshToken: string, email: string) {
-    // 데이터베이스 조회해 Refresh Token이 유효한지 확인
+    // 데이터베이스 조회 후 Refresh Token이 유효한지 확인
     const user = await this.getUserByEmail(email);
     const isRefreshTokenMatching = await compare(
       refreshToken,

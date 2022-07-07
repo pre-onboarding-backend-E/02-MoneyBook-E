@@ -1,23 +1,23 @@
-import {
-  HttpException,
-  HttpStatus,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { LoginDto } from 'src/user/dto/login.dto';
 import { UserService } from 'src/user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { compare } from 'bcryptjs';
+/* 
+    작성자 : 김용민, 박신영
+    부작성자 : 염하늘, 김태영
+  
+    JWT 생성 및 회원 인증을 구축합니다. 
+    */
 
 @Injectable()
 export class AuthService {
-  // JWT 생성을 다룬다.
   constructor(
     private userService: UserService,
     private jwtService: JwtService,
   ) {}
 
-  // 유저가 존재하는지, 비밀번호가 맞는지 확인 -> validateUser()
+  // 유저가 존재하는지 확인
   async validateUser(payload: LoginDto): Promise<any> {
     try {
       const { password, email } = payload;
@@ -32,7 +32,7 @@ export class AuthService {
     }
   }
 
-  // 비밀번호가 일치하는지 확인합니다.
+  // 비밀번호가 일치하는지 확인
   private async verityPassword(
     plainTextPassword: string,
     hashedPassword: string,
@@ -46,9 +46,9 @@ export class AuthService {
     }
   }
 
-  async getJwtAccessToken(email: string): Promise<string> {
+  async getJwtAccessToken(email: string): Promise<any> {
     // AccessToken 발급
-    // accessToken에 비밀번호를 제외한 유저 정보를 넣어줍니다.
+    // accessToken에 비밀번호를 제외한 유저 정보 => payload
     const payload = await this.userService.getUserByEmail(email);
     delete payload.password;
 
@@ -60,10 +60,16 @@ export class AuthService {
       },
     );
 
-    return accessToken;
+    const accessOption = {
+      domain: 'localhost',
+      path: '/',
+      httpOnly: true,
+    };
+
+    return { accessToken, accessOption, ...payload };
   }
 
-  async getJwtRefreshToken(email: string): Promise<string> {
+  async getJwtRefreshToken(email: string): Promise<any> {
     // RefreshToken 발급
     const payload = { email };
     const refreshToken = this.jwtService.sign(payload, {
@@ -71,7 +77,13 @@ export class AuthService {
       expiresIn: process.env.JWT_REFRESH_TOKEN_EXPIRATION_TIME,
     });
 
-    return refreshToken;
+    const refreshOption = {
+      domain: 'localhost',
+      path: '/',
+      httpOnly: true,
+    };
+
+    return { refreshToken, refreshOption };
   }
 
   getCookiesForLogOut() {
