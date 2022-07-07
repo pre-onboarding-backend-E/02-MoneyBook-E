@@ -16,22 +16,21 @@ export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ApiProperty()
+  @ApiProperty({ description: '이메일', example: 'test@mail.com' })
   @Column({ unique: true })
   email: string;
 
-  @ApiProperty()
   @Column()
   password: string;
 
-  @ApiProperty()
+  @ApiProperty({ description: '생성일' })
   @CreateDateColumn({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP(6)',
   })
   createdAt: Date;
 
-  @ApiProperty()
+  @ApiProperty({ description: '수정일' })
   @UpdateDateColumn({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP(6)',
