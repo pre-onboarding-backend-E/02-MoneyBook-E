@@ -9,15 +9,11 @@ import {
   Patch,
   Post,
   Query,
-  Req,
   UseGuards,
-  UsePipes,
-  ValidationPipe,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import {
   ApiBearerAuth,
-  ApiBody,
   ApiCreatedResponse,
   ApiResponse,
   ApiTags,
@@ -87,5 +83,16 @@ export class MoneyBookController {
   async deleteOne(@Param('id', ParseIntPipe) id: number, @GetUser() user : User) {
    const result = await this.moneybookService.deleteMoneyBook(id, user);
    return DefaultResponse.response(result, MSG.deleteOne.code, MSG.deleteOne.msg);
+  }
+
+  @Patch('/:id/restore')
+  @ApiBearerAuth('access_token')
+  @ApiCreatedResponse({
+    description: MSG.restoreOne.msg,
+    type: DefaultResponse,
+  })
+  async restoreOne(@Param('id', ParseIntPipe) id: number) {
+    const result = await this.moneybookService.restoreMoneyBook(id);
+    return DefaultResponse.response(result, MSG.restoreOne.code, MSG.restoreOne.msg);
   }
 }
