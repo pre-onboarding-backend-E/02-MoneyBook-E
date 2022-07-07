@@ -29,14 +29,16 @@ import { MSG } from 'src/common/response.enum';
 import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('User')
-@Controller('users')
-// @ApiBearerAuth('access_token')
-// @UseGuards(AuthGuard('jwt'))
+@Controller()
 export class UserController {
   constructor(
     private readonly userService: UserService,
     private readonly authService: AuthService,
   ) {}
+  /* 
+    작성자 : 김용민, 박신영
+    부작성자 : 염하늘, 김태영
+  */
 
   // 로그인
   @ApiBody({ type: LoginDto })
@@ -48,21 +50,10 @@ export class UserController {
     @Res({ passthrough: true }) res: Response,
   ) {
     const { email } = userData;
-    const accessToken = await this.authService.getJwtAccessToken(email);
-   // console.log(accessToken);
-    const accessOption = {
-      domain: 'localhost',
-      path: '/',
-      httpOnly: true,
-    };
-
-    const refreshToken = await this.authService.getJwtRefreshToken(email);
-
-    const refreshOption = {
-      domain: 'localhost',
-      path: '/',
-      httpOnly: true,
-    };
+    const { accessToken, accessOption, ...user } =
+      await this.authService.getJwtAccessToken(email);
+    const { refreshToken, refreshOption } =
+      await this.authService.getJwtRefreshToken(email);
 
     await this.userService.setCurrentRefreshToken(refreshToken, email);
     res.cookie('Authentication', accessToken, accessOption);
@@ -115,6 +106,8 @@ export class UserController {
       httpOnly: true,
     };
 
+    delete user.password;
+    delete user.hashedRefreshToken;
     res.cookie('Authentication', accessToken, accessOption);
     const result = UserResponse.response(user,MSG.refreshTokenWithUser.code, MSG.refreshTokenWithUser.msg);
     return result;

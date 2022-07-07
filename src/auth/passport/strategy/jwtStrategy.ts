@@ -4,17 +4,21 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { User } from 'src/user/entities/user.entity';
 import { UserService } from 'src/user/user.service';
 
+/* 
+    작성자 : 김용민
+    passport-jwt strategy를 구체화
+  */
+
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor(private userService: UserService) {
-    //console.log(process.env.JWT_SECRET_KEY);
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
         (request) => {
           return request?.cookies?.Authentication;
         },
-      ]), // jwt 추출 방법 : 쿠키
-      ignoreExpiration: false, // 토큰이 만료되면 401 예외
+      ]),
+      ignoreExpiration: false,
       secretOrKey: process.env.JWT_SECRET_KEY,
     });
   }
