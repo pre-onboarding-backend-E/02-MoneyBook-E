@@ -42,6 +42,7 @@ export class MoneyBook {
   @UpdateDateColumn({ type: 'timestamp', nullable: true })
   updatedAt: Date;
 
+  @ApiProperty()
   @DeleteDateColumn({ type: 'timestamp', nullable: true })
   deletedAt: Date;
 
