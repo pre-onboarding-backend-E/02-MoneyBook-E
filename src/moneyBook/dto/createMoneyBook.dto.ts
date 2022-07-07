@@ -9,9 +9,9 @@ export class CreateMoneyBookDto {
 
   @IsNotEmpty()
   @IsNumber()
-  @Matches(/[0-1]/, {
-    message: 'type은 0과 1만 입력 가능합니다.',
-  })
+  // @Matches(/[0-1]/, {
+  //   message: 'type은 0과 1만 입력 가능합니다.',
+  // })
   @ApiProperty({
     description: ' income or outcome',
     example: 0,

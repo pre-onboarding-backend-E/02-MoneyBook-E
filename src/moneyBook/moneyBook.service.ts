@@ -1,9 +1,13 @@
 import {
   BadRequestException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { ErrorType } from 'src/common/error.enum';
+import { DefaultError } from 'src/common/error.response';
+import { HttpErrorType } from 'src/common/httpError.type';
 import { MoneyBook } from 'src/moneyBook/entities/moneyBook.entity';
 import { Repository } from 'typeorm';
 import { CreateMoneyBookDto } from './dto/createMoneyBook.dto';
@@ -33,7 +37,6 @@ export class MoneyBookService {
     moneyBook.money = createDto.money;
     moneyBook.type = createDto.type == 0 ? MoneyType[0] : MoneyType[1];
 
-    // - 일 경우에도 합계에 - 나오게끔 처리
     let sum = 0;
     if (moneyBook.type == 'income') {
       sum += createDto.money;
@@ -52,7 +55,12 @@ export class MoneyBookService {
         deletedAt: null,
       },
     });
-    return result;
+    if (result) {
+      return result;
+    } else {
+      throw new NotFoundException();
+      // throw DefaultError.error(ErrorType.accountBookNotFound);
+    }
   }
   public async getAllMoneyBooks(): Promise<MoneyBook[]> {
     const allMoneyBooks = await this.moneybookRepository.find();
@@ -60,38 +68,47 @@ export class MoneyBookService {
   }
 
   // update x -> key 를 빼고 보냄.
-  // 현재 user 정보 mapping
   public async modifyMoneyBook(bookId: number, modifyDto: ModifyMoneyBookDto) {
-    if (modifyDto.hasOwnProperty('type')) {
-      const type = modifyDto.type == 0 ? MoneyType[0] : MoneyType[1];
+    try {
+      if (modifyDto.hasOwnProperty('type')) {
+        const type = modifyDto.type == 0 ? MoneyType[0] : MoneyType[1];
 
-      const modifiedMoneyBook = await this.moneybookRepository
-        .createQueryBuilder()
-        .update(MoneyBook)
-        .set({
-          money: modifyDto.money,
-          description: modifyDto.description,
-          type: type,
-        })
-        .where('id = :id', { id: bookId })
-        .execute();
+        await this.moneybookRepository
+          .createQueryBuilder()
+          .update(MoneyBook)
+          .set({
+            money: modifyDto.money,
+            description: modifyDto.description,
+            type: type,
+          })
+          .where('id = :id', { id: bookId })
+          .execute();
 
-      return modifiedMoneyBook;
+        const result = await this.moneybookRepository.findOne({
+          where: {
+            id: bookId,
+          },
+        });
+        return result;
+      }
+    } catch (error) {
+      if (error) {
+        throw DefaultError.error(HttpErrorType.BAD_REQUEST);
+      }
     }
-    // else
   }
-
   public async deleteMoneyBook(bookId: number) {
     const result = await this.moneybookRepository.findOne({
       where: {
         id: bookId,
       },
     });
-    if (result)
+    if (result) {
       await this.moneybookRepository.softDelete({
         id: bookId,
       });
-    else {
+      return bookId;
+    } else {
       throw NotFoundException;
     }
   }

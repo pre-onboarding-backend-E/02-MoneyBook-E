@@ -7,11 +7,20 @@ export abstract class DefaultResponseData {
   moneybook: MoneyBook;
 }
 
-export abstract class DefaultResponse extends BaseResponse {
+export class DefaultResponse extends BaseResponse {
   constructor() {
     super();
   }
 
   @ApiProperty()
   data: DefaultResponseData;
+
+  public static response(data: any, statusCode?: number, message?: string) {
+    const response = new DefaultResponse();
+    response.data = data;
+    response.message = message; // enum 지정
+    response.statusCode = statusCode || 200;
+
+    return response;
+  }
 }
