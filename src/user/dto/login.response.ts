@@ -7,7 +7,7 @@ export abstract class LoginResponseData {
   user: User;
 }
 
-export class LoginResponse extends BaseResponse {
+export class UserResponse extends BaseResponse {
   constructor() {
     super();
   }
@@ -16,7 +16,7 @@ export class LoginResponse extends BaseResponse {
   data: LoginResponseData;
 
   public static response(data: any, statusCode?: number, message?: string) {
-    const response = new LoginResponse();
+    const response = new UserResponse();
     response.data = data;
     response.message = message;
     response.statusCode = statusCode || 200;

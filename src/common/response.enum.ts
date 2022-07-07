@@ -1,7 +1,7 @@
 export const MSG = {
   createUser: { code: 201, msg: '회원가입 요청이 성공했습니다!' },
   loginUser: { code: 200, msg: '유저 로그인 요청에 성공했습니다!' },
-  logoutUser: { code: 200, msg: '유저 로그인 요청에 성공했습니다!' },
+  logoutUser: { code: 200, msg: '유저 로그아웃 요청에 성공했습니다!' },
   verifyUser: { code: 200, msg: '유저 인증 성공에 성공했습니다!' },
   refreshTokenWithUser: { code: 200, msg: '유저 인증 성공에 성공했습니다!' },
   createOne: { code: 201, msg: '가계부 생성에 성공했습니다!' },

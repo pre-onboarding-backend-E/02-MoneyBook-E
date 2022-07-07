@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import {
   Body,
   Controller,
@@ -18,12 +19,13 @@ import {
 import { Response } from 'express';
 import { AuthService } from 'src/auth/auth.service';
 import { LoginDto } from 'src/user/dto/login.dto';
-import { LoginResponse } from 'src/user/dto/login.response';
+import { UserResponse } from 'src/user/dto/login.response';
 import { CreateUserDTO } from './dto/createUser.dto';
 import { User } from './entities/user.entity';
 import { UserService } from './user.service';
 import { LocalAuthGuard } from 'src/auth/passport/guard/localAuthGuard';
 import { GetUser } from 'src/common/getUserDecorator';
+import { MSG } from 'src/common/response.enum';
 
 @ApiTags('User')
 @Controller('users')
@@ -35,7 +37,7 @@ export class UserController {
 
   // 로그인
   @ApiBody({ type: LoginDto })
-  @ApiCreatedResponse({ description: '성공', type: LoginResponse })
+  @ApiCreatedResponse({ description: MSG.loginUser.msg, type: UserResponse })
   @UseGuards(LocalAuthGuard)
   @Post('/login')
   async login(
@@ -62,17 +64,19 @@ export class UserController {
     await this.userService.setCurrentRefreshToken(refreshToken, email);
     res.cookie('Authentication', accessToken, accessOption);
     res.cookie('Refresh', refreshToken, refreshOption);
-    return accessToken;
+    const result = accessToken;
+    return UserResponse.response(result, MSG.loginUser.code, MSG.loginUser.msg)
   }
 
   // 회원 가입
-  @ApiBody({ type: CreateUserDTO })
-  @ApiCreatedResponse({ description: '성공', type: LoginResponse })
   @Post('/signup')
+  @ApiBody({ type: CreateUserDTO })
+  @ApiCreatedResponse({ description: MSG.createUser.msg, type: UserResponse })
   async signUp(
     @Body(ValidationPipe) createUserDto: CreateUserDTO,
-  ): Promise<User> {
-    return this.userService.createUser(createUserDto);
+  ) {
+    const result = await this.userService.createUser(createUserDto);
+    return UserResponse.response(result, MSG.createUser.code, MSG.createUser.msg);
   }
 
   // 로그아웃
@@ -91,7 +95,8 @@ export class UserController {
     res.cookie('Authentication', '', accessOption);
     res.cookie('Refresh', '', refreshOption);
 
-    return user;
+    const result = UserResponse.response(user,MSG.logoutUser.code, MSG.logoutUser.msg);
+    return result;
   }
 
   // 리프레시 토큰으로 액세스 토큰 재요청
@@ -108,6 +113,7 @@ export class UserController {
     };
 
     res.cookie('Authentication', accessToken, accessOption);
-    return user;
+    const result = UserResponse.response(user,MSG.refreshTokenWithUser.code, MSG.refreshTokenWithUser.msg);
+    return result;
   }
 }
