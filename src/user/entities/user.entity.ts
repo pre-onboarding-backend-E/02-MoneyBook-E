@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Exclude } from 'class-transformer';
 import { MoneyBook } from 'src/moneyBook/entities/moneyBook.entity';
 import {
   Column,
@@ -37,6 +38,11 @@ export class User {
     onUpdate: 'CURRENT_TIMESTAMP(6)',
   })
   updatedAt: Date;
+
+  @ApiProperty()
+  @Column({ nullable: true })
+  @Exclude()
+  hashedRefreshToken?: 'string';
 
   // moneyBook과 1:N 관계 형성
   // @OnetoMany(() =>  )
