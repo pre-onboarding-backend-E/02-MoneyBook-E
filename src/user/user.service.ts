@@ -22,22 +22,6 @@ export class UserService {
     private userRepository: Repository<User>,
   ) {}
 
-  async createTestUser(userData: LoginDto): Promise<object> {
-    const newTestUser = this.userRepository.create(userData);
-    await this.userRepository.insert(newTestUser);
-    return { message: 'Create success', data: userData };
-  }
-
-  async getUser(id: number): Promise<User> {
-    const user = await this.userRepository.findOne({ where: { id } });
-
-    if (!user) {
-      throw new NotFoundException('해당 사용자를 찾을 수 없습니다.');
-    }
-
-    return user;
-  }
-
   async createUser(createUserDto: CreateUserDTO): Promise<User> {
     const { email, password, comfirmPassword } = createUserDto;
 
@@ -71,16 +55,21 @@ export class UserService {
     });
   }
 
-  async setCurrentRefreshToken(refreshToken: string, id: number) {
+  async setCurrentRefreshToken(refreshToken: string, email: string) {
     // DB에 발급받은 Refresh Token을 암호화하여 저장(bycrypt)
     const salt = await bcrypt.genSalt();
     const hashedRefreshToken = await bcrypt.hash(refreshToken, salt);
-    await this.userRepository.update(id, { hashedRefreshToken });
+    await this.userRepository
+      .createQueryBuilder()
+      .update(User)
+      .set({ hashedRefreshToken: hashedRefreshToken })
+      .where('email = :email', { email })
+      .execute();
   }
 
-  async getUserRefreshTokenMatches(refreshToken: string, id: number) {
+  async getUserRefreshTokenMatches(refreshToken: string, email: string) {
     // 데이터베이스 조회해 Refresh Token이 유효한지 확인
-    const user = await this.getUser(id);
+    const user = await this.getUserByEmail(email);
     const isRefreshTokenMatching = await compare(
       refreshToken,
       user.hashedRefreshToken,

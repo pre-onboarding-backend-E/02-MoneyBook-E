@@ -5,7 +5,7 @@ import { MoneyBooksModule } from './moneyBook/moneyBook.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
-import { JwtAuthGuard } from './auth/jwtAuthGuard';
+import { JwtAuthGuard } from './auth/passport/guard/jwtAuthGuard';
 
 @Module({
   imports: [
