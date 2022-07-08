@@ -4,8 +4,6 @@ import { AuthModule } from './auth/auth.module';
 import { MoneyBooksModule } from './moneyBook/moneyBook.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
-import { APP_GUARD } from '@nestjs/core';
-import { JwtAuthGuard } from './auth/passport/guard/jwtAuthGuard';
 
 @Module({
   imports: [
@@ -31,6 +29,5 @@ import { JwtAuthGuard } from './auth/passport/guard/jwtAuthGuard';
       timezone: 'Z',
     }),
   ],
-  //providers: [{ provide: APP_GUARD, useClass: JwtAuthGuard }],
 })
 export class AppModule {}
