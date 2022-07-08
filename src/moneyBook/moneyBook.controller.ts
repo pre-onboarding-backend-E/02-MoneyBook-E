@@ -10,6 +10,7 @@ import {
   Post,
   Query,
   UseGuards,
+  ValidationPipe,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import {
@@ -46,7 +47,7 @@ export class MoneyBookController {
     type: DefaultResponse,
   })
 
-  async createOne(@Body() createDto: CreateMoneyBookDto,@GetUser() user : User) {
+  async createOne(@Body(ValidationPipe) createDto: CreateMoneyBookDto,@GetUser() user : User) {
     const result = await this.moneybookService.createMoneyBook(createDto,user);
     return DefaultResponse.response(result, MSG.createOne.code, MSG.createOne.msg);
   }
