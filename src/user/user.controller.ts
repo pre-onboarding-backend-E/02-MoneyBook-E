@@ -95,7 +95,7 @@ export class UserController {
   // 리프레시 토큰으로 액세스 토큰 재요청
   @UseGuards(JwtRefreshGuard)
   @ApiBearerAuth('access_token')
-  @Get('/refresh')
+  @Get('/refreshToken')
   async refresh(@Req() req, @Res({ passthrough: true }) res: Response) {
     const user = req.user;
     const accessToken = await this.authService.getJwtAccessToken(user.email);

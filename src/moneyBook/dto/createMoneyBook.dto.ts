@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsNumber } from 'class-validator';
+import { MoneyType } from '../type/moneyBook.enum';
 
 export class CreateMoneyBookDto {
   @IsNotEmpty()
@@ -9,7 +10,7 @@ export class CreateMoneyBookDto {
 
   @IsNotEmpty()
   @IsNumber()
-  //@Matches(/[^0-1]/)
+  @IsEnum(MoneyType)
   @ApiProperty({
     description: ' 0을 입력하면 수입 (income) / 1을 입력하면 지출 (outcome)',
     example: 0,
