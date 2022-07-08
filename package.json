@@ -106,5 +106,9 @@
     "verbose": true,
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
+  },
+  "volta": {
+    "node": "16.16.0",
+    "yarn": "1.22.19"
   }
 }
