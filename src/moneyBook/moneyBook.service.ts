@@ -31,7 +31,7 @@ export class MoneyBookService {
   public async getMoneyBook(bookId: number, user: User) {
     try {
       const result = await this.moneybookRepository.findOne({
-        where: [ { id: bookId }, {user} ]
+        where: [{ id: bookId }, user],
       });
       if (result) {
         return result;
@@ -47,9 +47,7 @@ export class MoneyBookService {
   // 로그인한 유저가 작성한 가계부 내역 중 가장 최신의 정보를 불러옴.
   public async latestMoneyBook(@GetUser() user: User) {
     const latestResult = await this.moneybookRepository.findOne({
-      where: {
-        user: [user]
-      },
+      where: [user],
       order: {
         updatedAt: 'DESC',
         createdAt: 'DESC',
@@ -103,12 +101,10 @@ export class MoneyBookService {
     }
   }
   // 유저가 작성한 가계부 목록 (내역) 최신 순으로 조회 (user가 작성한 거 없을 때 test)
-  public async getAllMoneyBooks( user: User): Promise<MoneyBook[]> {
+  public async getAllMoneyBooks(user: User): Promise<MoneyBook[]> {
     try {
       const allMoneyBooks = await this.moneybookRepository.find({
-        where: {
-          user: [ user ]
-        },
+        where: [user],
         order: {
           createdAt: 'DESC',
         },
@@ -173,7 +169,7 @@ export class MoneyBookService {
       const result = await this.getMoneyBook(bookId, user);
       if (result) {
         await this.moneybookRepository.softDelete({
-          id: bookId
+          id: bookId,
         });
         return bookId;
       } else {
@@ -193,7 +189,7 @@ export class MoneyBookService {
   ): Promise<MoneyBook> {
     try {
       const accountBook = await this.moneybookRepository.findOne({
-        where: [ { id: bookId }, {user} ],
+        where: [{ id: bookId }, user],
         withDeleted: true,
       });
       if (!accountBook) {
