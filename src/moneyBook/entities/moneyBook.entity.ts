@@ -48,8 +48,8 @@ export class MoneyBook {
   deletedAt: Date;
 
   @ManyToOne(() => User, (user) => user.moneyBook, {
-    nullable: true,
-    createForeignKeyConstraints: false,
+   // nullable: true,
+   createForeignKeyConstraints: false,
   })
-  user: number;
+  user: User;
 }
