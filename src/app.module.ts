@@ -22,7 +22,7 @@ import { ConfigModule } from '@nestjs/config';
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
       entities: ['dist/**/*.entity.{ts,js}'],
-      synchronize: false,
+      synchronize: true,
       logging: true,
       retryAttempts: 30,
       retryDelay: 5000,

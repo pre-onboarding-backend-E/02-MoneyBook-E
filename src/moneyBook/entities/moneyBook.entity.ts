@@ -47,9 +47,6 @@ export class MoneyBook {
   @DeleteDateColumn({ type: 'timestamp', nullable: true })
   deletedAt: Date;
 
-  @ManyToOne(() => User, (user) => user.moneyBook, {
-    nullable: true,
-    createForeignKeyConstraints: false,
-  })
-  user: number;
+  @ManyToOne(() => User, (user) => user.moneyBooks)
+  user: User;
 }
