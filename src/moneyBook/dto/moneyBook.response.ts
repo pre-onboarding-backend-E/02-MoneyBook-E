@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { BaseResponse } from 'src/common/baseResponse.dto';
+import { MSG } from 'src/common/response.enum';
 import { MoneyBook } from '../entities/moneyBook.entity';
 
 export abstract class DefaultResponseData {
@@ -18,7 +19,7 @@ export class DefaultResponse extends BaseResponse {
   public static response(data: any, statusCode?: number, message?: string) {
     const response = new DefaultResponse();
     response.data = data;
-    response.message = message; // enum 지정
+    response.message = message;
     response.statusCode = statusCode || 200;
 
     return response;

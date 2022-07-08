@@ -9,13 +9,11 @@ import {
   Patch,
   Post,
   Query,
-  Req,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import {
   ApiBearerAuth,
-  ApiBody,
   ApiCreatedResponse,
   ApiResponse,
   ApiTags,
@@ -28,73 +26,68 @@ import { ModifyMoneyBookDto } from './dto/modifyMoneyBook.dto';
 import { DefaultResponse } from './dto/moneyBook.response';
 import { MoneyBookService } from './moneyBook.service';
 
-@ApiTags('MoneyBooks')
-@Controller('moneybooks')
+@ApiTags('AccountBooks')
+@Controller('accountBooks')
+@ApiBearerAuth('access_token')
 @UseGuards(AuthGuard('jwt'))
 export class MoneyBookController {
 
   constructor(private moneybookService: MoneyBookService) {}
 
   @Post('')
-  @ApiBearerAuth('access_token')
   @ApiCreatedResponse({
     description: MSG.createOne.msg,
     type: DefaultResponse,
   })
-  async createOne(@Body() createDto: CreateMoneyBookDto) {
-    const result = await this.moneybookService.createMoneyBook(createDto);
+
+  async createOne(@Body() createDto: CreateMoneyBookDto,@GetUser() user : User) {
+    const result = await this.moneybookService.createMoneyBook(createDto,user);
     return DefaultResponse.response(result, MSG.createOne.code, MSG.createOne.msg);
   }
 
-  // Response 나오게 처리 할 것.
   @Patch('/:id')
-  @ApiBearerAuth('access_token')
   @ApiResponse({
-    description: MSG.modifyOne.msg,
+    description: MSG.modifyOne.msg, 
     type: DefaultResponse,
   })
   async modifyOne(
     @Param('id', ParseIntPipe) id: number,
-    @Body() modifyDto: ModifyMoneyBookDto,
+    @Body() modifyDto: ModifyMoneyBookDto, @GetUser() user : User
   ) {
-    const result = await this.moneybookService.modifyMoneyBook(id, modifyDto);
-    console.log(2333,result)
+    const result = await this.moneybookService.modifyMoneyBook(id, modifyDto,user);
     return DefaultResponse.response(result, MSG.modifyOne.code, MSG.modifyOne.msg);
   }
 
   @Get('')
-  @ApiBearerAuth('access_token')
   @ApiResponse({
     description: MSG.getAll.msg,
   })
-  async getAll() {
-    const result = await this.moneybookService.getAllMoneyBooks();
+  async getAll(@GetUser() user : User ) {
+    const result = await this.moneybookService.getAllMoneyBooks(user);
     return  DefaultResponse.response(result, MSG.getAll.code, MSG.getAll.msg);
   }
 
   @Get('/:id')
-  @ApiBearerAuth('access_token')
   @ApiResponse({
     description: MSG.getOne.msg,
   })
-  async getOne(@Query('id', ParseIntPipe) id: number) {
-    const result = await this.moneybookService.getMoneyBook(id);
+  async getOne(@Query('id', ParseIntPipe) id: number, @GetUser() user : User) {
+    const result = await this.moneybookService.getMoneyBook(id, user);
     return DefaultResponse.response(result, MSG.getOne.code, MSG.getOne.msg);
   }
 
   @Delete('/:id')
-  @ApiBearerAuth('access_token')
   @ApiResponse({
     description: MSG.deleteOne.msg,
   })
-  async deleteOne(@Param('id', ParseIntPipe) id: number) {
-   const result = await this.moneybookService.deleteMoneyBook(id);
+  async deleteOne(@Param('id', ParseIntPipe) id: number, @GetUser() user : User) {
+   const result = await this.moneybookService.deleteMoneyBook(id, user);
    return DefaultResponse.response(result, MSG.deleteOne.code, MSG.deleteOne.msg);
   }
 
   @Patch('/:id/restore')
   @ApiBearerAuth('access_token')
-  @ApiCreatedResponse({
+  @ApiResponse({
     description: MSG.restoreOne.msg,
     type: DefaultResponse,
   })

@@ -1,5 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsString, Matches } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsNotEmpty, IsNumber } from 'class-validator';
 
 export class CreateMoneyBookDto {
   @IsNotEmpty()
@@ -9,15 +9,13 @@ export class CreateMoneyBookDto {
 
   @IsNotEmpty()
   @IsNumber()
-  // @Matches(/[0-1]/, {
-  //   message: 'type은 0과 1만 입력 가능합니다.',
-  // })
+  //@Matches(/[^0-1]/)
   @ApiProperty({
-    description: ' income or outcome',
+    description: ' 0을 입력하면 수입 (income) / 1을 입력하면 지출 (outcome)',
     example: 0,
   })
   type: number;
 
-  @ApiProperty({ description: '메모', example: 'memo_1' })
+  @ApiPropertyOptional({ description: '메모', example: 'memo_1' })
   description: string;
 }

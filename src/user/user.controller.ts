@@ -26,6 +26,7 @@ import { UserService } from './user.service';
 import { LocalAuthGuard } from 'src/auth/passport/guard/localAuthGuard';
 import { GetUser } from 'src/common/getUserDecorator';
 import { MSG } from 'src/common/response.enum';
+import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('User')
 @Controller()
@@ -41,7 +42,7 @@ export class UserController {
 
   // 로그인
   @ApiBody({ type: LoginDto })
-  @ApiCreatedResponse({ description: MSG.loginUser.msg, type: UserResponse })
+  @ApiCreatedResponse({ description: MSG.loginUser.msg })
   @UseGuards(LocalAuthGuard)
   @Post('/login')
   async login(
