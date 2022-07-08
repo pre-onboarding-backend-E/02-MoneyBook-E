@@ -3,13 +3,13 @@ import { LoginDto } from 'src/user/dto/login.dto';
 import { UserService } from 'src/user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { compare } from 'bcryptjs';
-/* 
-    작성자 : 김용민, 박신영
-    부작성자 : 염하늘, 김태영
-  
-    JWT 생성 및 회원 인증을 구축합니다. 
-    */
 
+/* 
+  작성자 : 김용민, 박신영
+  부작성자 : 염하늘, 김태영
+  
+  JWT 생성 및 회원 인증을 구축합니다. 
+*/
 @Injectable()
 export class AuthService {
   constructor(
@@ -22,7 +22,7 @@ export class AuthService {
     try {
       const { password, email } = payload;
       const userData = await this.userService.getUserByEmail(email);
-      await this.verityPassword(password, userData.password);
+      await this.verifyPassword(password, userData.password);
       return userData;
     } catch (e) {
       throw new HttpException(
@@ -33,7 +33,7 @@ export class AuthService {
   }
 
   // 비밀번호가 일치하는지 확인
-  private async verityPassword(
+  private async verifyPassword(
     plainTextPassword: string,
     hashedPassword: string,
   ) {

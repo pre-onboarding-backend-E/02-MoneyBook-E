@@ -3,12 +3,10 @@ import {
   ConflictException,
   Injectable,
   InternalServerErrorException,
-  NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateUserDTO } from './dto/createUser.dto';
-import { LoginDto } from './dto/login.dto';
 import { User } from './entities/user.entity';
 import * as bcrypt from 'bcryptjs';
 import { compare } from 'bcryptjs';
@@ -28,6 +26,7 @@ export class UserService {
     private userRepository: Repository<User>,
   ) {}
 
+  // 비밀번호 체크, 중복 이메일 확인 후 사용자를 추가합니다.
   async createUser(createUserDto: CreateUserDTO): Promise<User> {
     const { email, password, confirmPassword } = createUserDto;
 
@@ -55,9 +54,10 @@ export class UserService {
     }
   }
 
+  // 이메일로 사용자를 가져옵니다.
   async getUserByEmail(email: string): Promise<User | undefined> {
     return this.userRepository.findOne({
-      where: { email: email },
+      where: { email },
     });
   }
 

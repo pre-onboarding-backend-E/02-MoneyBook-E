@@ -26,7 +26,6 @@ import { UserService } from './user.service';
 import { LocalAuthGuard } from 'src/auth/passport/guard/localAuthGuard';
 import { GetUser } from 'src/common/getUserDecorator';
 import { MSG } from 'src/common/response.enum';
-import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('User')
 @Controller()

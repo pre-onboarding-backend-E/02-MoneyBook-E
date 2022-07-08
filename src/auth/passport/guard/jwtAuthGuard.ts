@@ -2,6 +2,11 @@ import { ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
 
+/*
+  작성자 : 김용민, 박신영
+  부작성자 : 염하늘, 김태영
+   - jwt 인증이 유효한지 확인한다.
+*/
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
   constructor(private reflector: Reflector) {
