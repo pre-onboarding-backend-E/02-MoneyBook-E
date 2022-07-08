@@ -10,6 +10,7 @@ import {
   Post,
   Query,
   UseGuards,
+  ValidationPipe,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import {
@@ -31,6 +32,12 @@ import { MoneyBookService } from './moneyBook.service';
 @ApiBearerAuth('access_token')
 @UseGuards(AuthGuard('jwt'))
 export class MoneyBookController {
+  
+  /* 
+    작성자 : 염하늘 / 김용민
+      - CRRUD 컨트롤러 작성 (염하늘)
+      - Restore 컨트롤러 작성 (김용민)
+  */
 
   constructor(private moneybookService: MoneyBookService) {}
 
@@ -91,8 +98,8 @@ export class MoneyBookController {
     description: MSG.restoreOne.msg,
     type: DefaultResponse,
   })
-  async restoreOne(@Param('id', ParseIntPipe) id: number) {
-    const result = await this.moneybookService.restoreMoneyBook(id);
+  async restoreOne(@Param('id', ParseIntPipe) id: number,@GetUser() user : User) {
+    const result = await this.moneybookService.restoreMoneyBook(id,user);
     return DefaultResponse.response(result, MSG.restoreOne.code, MSG.restoreOne.msg);
   }
 }

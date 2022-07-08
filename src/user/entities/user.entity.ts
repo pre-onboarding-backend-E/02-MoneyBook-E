@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Exclude } from 'class-transformer';
+import { classToPlain, Exclude } from 'class-transformer';
 import { MoneyBook } from 'src/moneyBook/entities/moneyBook.entity';
 import {
   Column,
@@ -21,6 +21,7 @@ export class User {
   email: string;
 
   @Column()
+  @Exclude({ toPlainOnly: true })
   password: string;
 
   @ApiProperty({ description: '생성일' })
@@ -40,11 +41,15 @@ export class User {
 
   @ApiProperty()
   @Column({ nullable: true })
-  @Exclude()
-  hashedRefreshToken!: 'string';
+  @Exclude({ toPlainOnly: true })
+  hashedRefreshToken?: 'string';
 
   // moneyBook과 1:N 관계 형성
   // @OnetoMany(() =>  )
   @OneToMany(() => MoneyBook, (moneyBook) => moneyBook.user)
-  moneyBook: MoneyBook[];
+  moneyBooks: MoneyBook[];
+
+  toJSON() {
+    return classToPlain(this);
+  }
 }

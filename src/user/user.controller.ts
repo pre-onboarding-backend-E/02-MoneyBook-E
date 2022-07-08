@@ -3,11 +3,10 @@ import {
   Body,
   Controller,
   Post,
-  ValidationPipe,
   UseGuards,
   Res,
   Get,
-  Req,
+  ValidationPipe,
 } from '@nestjs/common';
 import { JwtRefreshGuard } from 'src/auth/passport/guard/jwtRefreshGuard';
 import {
@@ -26,8 +25,12 @@ import { UserService } from './user.service';
 import { LocalAuthGuard } from 'src/auth/passport/guard/localAuthGuard';
 import { GetUser } from 'src/common/getUserDecorator';
 import { MSG } from 'src/common/response.enum';
-import { AuthGuard } from '@nestjs/passport';
+import { defaultTokenOption } from 'src/common/tokenOption.interface';
 
+/* 
+  작성자 : 박신영, 김용민
+  부작성자 : 염하늘, 김태영
+*/
 @ApiTags('User')
 @Controller()
 export class UserController {
@@ -35,91 +38,93 @@ export class UserController {
     private readonly userService: UserService,
     private readonly authService: AuthService,
   ) {}
-  /* 
-    작성자 : 김용민, 박신영
-    부작성자 : 염하늘, 김태영
-  */
 
-  // 로그인
+  /* 
+    - access token, resfresh token 발급하여 로그인 처리
+  */
   @ApiBody({ type: LoginDto })
   @ApiCreatedResponse({ description: MSG.loginUser.msg })
   @UseGuards(LocalAuthGuard)
   @Post('/login')
   async login(
-    @Body() userData: LoginDto,
+    @Body(ValidationPipe) userData: LoginDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const { email } = userData;
-    const { accessToken, accessOption, ...user } =
-      await this.authService.getJwtAccessToken(email);
-    const { refreshToken, refreshOption } =
-      await this.authService.getJwtRefreshToken(email);
+    const { accessToken, accessOption, refreshToken, refreshOption } =
+      await this.authService.getTokens(userData.email);
 
-    await this.userService.setCurrentRefreshToken(refreshToken, email);
+    await this.userService.setCurrentRefreshToken(refreshToken, userData.email);
+
     res.cookie('Authentication', accessToken, accessOption);
     res.cookie('Refresh', refreshToken, refreshOption);
-    const result = accessToken;
-    return UserResponse.response(result, MSG.loginUser.code, MSG.loginUser.msg);
+
+    return UserResponse.response(
+      accessToken,
+      MSG.loginUser.code,
+      MSG.loginUser.msg,
+    );
   }
 
-  // 회원 가입
+  /* 
+    - 사용자를 생성하여 회원가입 처리
+  */
   @Post('/signup')
   @ApiBody({ type: CreateUserDTO })
   @ApiCreatedResponse({ description: MSG.createUser.msg, type: UserResponse })
   async signUp(@Body(ValidationPipe) createUserDto: CreateUserDTO) {
-    const result = await this.userService.createUser(createUserDto);
+    const user = await this.userService.createUser(createUserDto);
     return UserResponse.response(
-      result,
+      user.toJSON(),
       MSG.createUser.code,
       MSG.createUser.msg,
     );
   }
 
-  // 로그아웃
+  /* 
+    - 토큰을 제거하여 로그아웃 기능 구현
+  */
   @ApiBearerAuth('access_token')
   @ApiCreatedResponse({ description: '성공' })
   @UseGuards(JwtRefreshGuard)
   @Post('/logout')
   async logout(
-    @Req() req,
     @Res({ passthrough: true }) res: Response,
     @GetUser() user: User,
   ) {
     const { accessOption, refreshOption } =
       this.authService.getCookiesForLogOut();
-    await this.userService.removeRefreshToken(req.user.id);
+    console.log(user);
+    await this.userService.removeRefreshToken(user.id);
+
     res.cookie('Authentication', '', accessOption);
     res.cookie('Refresh', '', refreshOption);
 
-    const result = UserResponse.response(
-      user,
+    return UserResponse.response(
+      user.toJSON(),
       MSG.logoutUser.code,
       MSG.logoutUser.msg,
     );
-    return result;
   }
 
-  // 리프레시 토큰으로 액세스 토큰 재요청
+  /* 
+    - 리프레시 토큰으로 액세스 토큰 재요청
+  */
   @UseGuards(JwtRefreshGuard)
   @ApiBearerAuth('access_token')
-  @Get('/refresh')
-  async refresh(@Req() req, @Res({ passthrough: true }) res: Response) {
-    const user = req.user;
+  @Get('/refreshToken')
+  async refresh(
+    @GetUser() user: User,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const accessToken = await this.authService.getJwtAccessToken(user.email);
-    const accessOption = {
-      domain: 'localhost',
-      path: '/',
-      httpOnly: true,
-    };
+    const accessOption = defaultTokenOption;
 
-    delete user.password;
-    delete user.hashedRefreshToken;
     res.cookie('Authentication', accessToken, accessOption);
-    const result = UserResponse.response(
-      user,
+
+    return UserResponse.response(
+      user.toJSON(),
       MSG.refreshTokenWithUser.code,
       MSG.refreshTokenWithUser.msg,
     );
-    return result;
   }
 }
