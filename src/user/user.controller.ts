@@ -60,13 +60,14 @@ export class UserController {
     const result = accessToken;
     return UserResponse.response(result, MSG.loginUser.code, MSG.loginUser.msg)
   }
+  //로직 서비스 단으로 옮기기
 
   // 회원 가입
   @Post('/signup')
   @ApiBody({ type: CreateUserDTO })
   @ApiCreatedResponse({ description: MSG.createUser.msg, type: UserResponse })
   async signUp(
-    @Body(ValidationPipe) createUserDto: CreateUserDTO,
+    @Body() createUserDto: CreateUserDTO,
   ) {
     const result = await this.userService.createUser(createUserDto);
     return UserResponse.response(result, MSG.createUser.code, MSG.createUser.msg);
@@ -104,7 +105,7 @@ export class UserController {
       path: '/',
       httpOnly: true,
     };
-
+// access option 따로 interface화. 로직 서비스 단으로 옮기기
     delete user.password;
     delete user.hashedRefreshToken;
     res.cookie('Authentication', accessToken, accessOption);
