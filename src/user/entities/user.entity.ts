@@ -41,7 +41,7 @@ export class User {
   @ApiProperty()
   @Column({ nullable: true })
   @Exclude()
-  hashedRefreshToken?: 'string';
+  hashedRefreshToken!: 'string';
 
   // moneyBook과 1:N 관계 형성
   // @OnetoMany(() =>  )

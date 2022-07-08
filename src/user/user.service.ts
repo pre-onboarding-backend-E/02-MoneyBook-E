@@ -3,12 +3,10 @@ import {
   ConflictException,
   Injectable,
   InternalServerErrorException,
-  NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateUserDTO } from './dto/createUser.dto';
-import { LoginDto } from './dto/login.dto';
 import { User } from './entities/user.entity';
 import * as bcrypt from 'bcryptjs';
 import { compare } from 'bcryptjs';

@@ -44,6 +44,7 @@ export class AuthService {
         HttpStatus.BAD_REQUEST,
       );
     }
+    return isPasswordMatch;
   }
 
   async getJwtAccessToken(email: string): Promise<any> {

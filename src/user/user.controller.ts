@@ -59,18 +59,20 @@ export class UserController {
     res.cookie('Authentication', accessToken, accessOption);
     res.cookie('Refresh', refreshToken, refreshOption);
     const result = accessToken;
-    return UserResponse.response(result, MSG.loginUser.code, MSG.loginUser.msg)
+    return UserResponse.response(result, MSG.loginUser.code, MSG.loginUser.msg);
   }
 
   // 회원 가입
   @Post('/signup')
   @ApiBody({ type: CreateUserDTO })
   @ApiCreatedResponse({ description: MSG.createUser.msg, type: UserResponse })
-  async signUp(
-    @Body(ValidationPipe) createUserDto: CreateUserDTO,
-  ) {
+  async signUp(@Body(ValidationPipe) createUserDto: CreateUserDTO) {
     const result = await this.userService.createUser(createUserDto);
-    return UserResponse.response(result, MSG.createUser.code, MSG.createUser.msg);
+    return UserResponse.response(
+      result,
+      MSG.createUser.code,
+      MSG.createUser.msg,
+    );
   }
 
   // 로그아웃
@@ -89,7 +91,11 @@ export class UserController {
     res.cookie('Authentication', '', accessOption);
     res.cookie('Refresh', '', refreshOption);
 
-    const result = UserResponse.response(user,MSG.logoutUser.code, MSG.logoutUser.msg);
+    const result = UserResponse.response(
+      user,
+      MSG.logoutUser.code,
+      MSG.logoutUser.msg,
+    );
     return result;
   }
 
@@ -109,7 +115,11 @@ export class UserController {
     delete user.password;
     delete user.hashedRefreshToken;
     res.cookie('Authentication', accessToken, accessOption);
-    const result = UserResponse.response(user,MSG.refreshTokenWithUser.code, MSG.refreshTokenWithUser.msg);
+    const result = UserResponse.response(
+      user,
+      MSG.refreshTokenWithUser.code,
+      MSG.refreshTokenWithUser.msg,
+    );
     return result;
   }
 }
