@@ -57,12 +57,8 @@ export class UserController {
 
     res.cookie('Authentication', accessToken, accessOption);
     res.cookie('Refresh', refreshToken, refreshOption);
-
-    return UserResponse.response(
-      accessToken,
-      MSG.loginUser.code,
-      MSG.loginUser.msg,
-    );
+    const result = accessToken;
+    return UserResponse.response(result, MSG.loginUser.code, MSG.loginUser.msg);
   }
 
   /* 
@@ -72,9 +68,9 @@ export class UserController {
   @ApiBody({ type: CreateUserDTO })
   @ApiCreatedResponse({ description: MSG.createUser.msg, type: UserResponse })
   async signUp(@Body(ValidationPipe) createUserDto: CreateUserDTO) {
-    const user = await this.userService.createUser(createUserDto);
+    const result = await this.userService.createUser(createUserDto);
     return UserResponse.response(
-      user.toJSON(),
+      result,
       MSG.createUser.code,
       MSG.createUser.msg,
     );
@@ -99,11 +95,12 @@ export class UserController {
     res.cookie('Authentication', '', accessOption);
     res.cookie('Refresh', '', refreshOption);
 
-    return UserResponse.response(
-      user.toJSON(),
+    const result = UserResponse.response(
+      user,
       MSG.logoutUser.code,
       MSG.logoutUser.msg,
     );
+    return result;
   }
 
   /* 
@@ -120,11 +117,11 @@ export class UserController {
     const accessOption = defaultTokenOption;
 
     res.cookie('Authentication', accessToken, accessOption);
-
-    return UserResponse.response(
-      user.toJSON(),
+    const result = UserResponse.response(
+      user,
       MSG.refreshTokenWithUser.code,
       MSG.refreshTokenWithUser.msg,
     );
+    return result;
   }
 }

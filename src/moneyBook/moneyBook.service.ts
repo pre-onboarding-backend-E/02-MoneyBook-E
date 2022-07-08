@@ -29,30 +29,29 @@ export class MoneyBookService {
 
   // 가계부 내역이 존재하는지 확인하고 존재하면 해당 정보를 불러옴.
   public async getMoneyBook(bookId: number, user: User) {
-    try {
-      const result = await this.moneybookRepository.findOne({
-        where: [{ id: bookId }, user],
-      });
+
+      const result = await this.moneybookRepository.
+      createQueryBuilder('accountbook')
+      .innerJoinAndSelect('accountbook.user',"user")
+      .where('user.id = :userId', {userId : user.id})
+      .andWhere('accountbook.id =:bookId',{bookId})
+      .getOne()
       if (result) {
         return result;
       } else {
         throw new NotFoundException('존재하지 않는 내역입니다.');
       }
-    } catch (error) {
-      if (error) {
-        throw new InternalServerErrorException();
-      }
-    }
-  }
+}
   // 로그인한 유저가 작성한 가계부 내역 중 가장 최신의 정보를 불러옴.
   public async latestMoneyBook(@GetUser() user: User) {
-    const latestResult = await this.moneybookRepository.findOne({
-      where: [user],
-      order: {
-        updatedAt: 'DESC',
-        createdAt: 'DESC',
-      },
-    });
+    const latestResult = await this.moneybookRepository.
+    createQueryBuilder('accountbook')
+    .innerJoinAndSelect('accountbook.user',"user")
+    .where('user.id = :userId', {userId : user.id})
+    .orderBy('accountbook.updatedAt','DESC')
+    .orderBy('accountbook.createdAt','DESC')
+    .limit(1)
+    .getOne()
     if (latestResult) {
       return latestResult;
     }
@@ -100,22 +99,19 @@ export class MoneyBookService {
       }
     }
   }
-  // 유저가 작성한 가계부 목록 (내역) 최신 순으로 조회 (user가 작성한 거 없을 때 test)
+  // 유저가 작성한 가계부 목록 (내역) 최신 순으로 조회
   public async getAllMoneyBooks(user: User): Promise<MoneyBook[]> {
-    try {
-      const allMoneyBooks = await this.moneybookRepository.find({
-        where: [user],
-        order: {
-          createdAt: 'DESC',
-        },
-      });
+
+    const allMoneyBooks = await this.moneybookRepository.
+    createQueryBuilder('accountbook')
+    .innerJoinAndSelect('accountbook.user',"user")
+    .where('user.id = :userId', {userId : user.id})
+    .orderBy('accountbook.createdAt','DESC')
+    .getMany()
+    if (allMoneyBooks) {
       return allMoneyBooks;
-    } catch (error) {
-      if (error) {
-        throw new InternalServerErrorException();
-      }
-    }
   }
+}
 
   // 유저가 작성한 가계부 상세 내역을 수정함.
   // 수정을 원하지 않을 경우 해당 key 값을 빼고 보냄.
@@ -124,12 +120,8 @@ export class MoneyBookService {
     modifyDto: ModifyMoneyBookDto,
     user: User,
   ) {
-    try {
       if (modifyDto.hasOwnProperty('type')) {
-        // 해당 상세 가계부 내역 존재하는지 확인
-        const existDetail = await this.getMoneyBook(bookId, user);
-        if (!existDetail)
-          throw new NotFoundException('해당 상세 가계부 내역이 없습니다.');
+        await this.getMoneyBook(bookId, user);
 
         // 해당 유저가 작성한 가계부 내역 - 합계 존재하는지 확인
         const moneybookInfo = await this.accountTotal(user, modifyDto);
@@ -155,17 +147,12 @@ export class MoneyBookService {
         throw new BadRequestException(
           '수정할 내역이 올바르게 입력되지 않았습니다.',
         );
-      }
-    } catch (error) {
-      if (error) {
-        throw new InternalServerErrorException();
-      }
     }
   }
 
-  // 유저가 작성한 가계부 상세 내역을 삭제함. (soft delete 처리하여 내역은 존재함.) try catch
+  // 유저가 작성한 가계부 상세 내역을 삭제함. (soft delete 처리하여 내역은 존재함.) 
   public async deleteMoneyBook(bookId: number, user: User) {
-    try {
+    
       const result = await this.getMoneyBook(bookId, user);
       if (result) {
         await this.moneybookRepository.softDelete({
@@ -174,11 +161,6 @@ export class MoneyBookService {
         return bookId;
       } else {
         throw new NotFoundException('존재하지 않는 내역입니다.');
-      }
-    } catch (error) {
-      if (error) {
-        throw new InternalServerErrorException();
-      }
     }
   }
 
@@ -186,25 +168,23 @@ export class MoneyBookService {
   public async restoreMoneyBook(
     bookId: number,
     user: User,
-  ): Promise<MoneyBook> {
-    try {
-      const accountBook = await this.moneybookRepository.findOne({
-        where: [{ id: bookId }, user],
-        withDeleted: true,
-      });
-      if (!accountBook) {
-        throw new NotFoundException('존재하지 않는 내역입니다.');
-      }
-      if (accountBook.deletedAt === null) {
-        throw new BadRequestException('삭제되지 않은 내역입니다.');
-      }
-      accountBook.deletedAt = null;
-      await this.moneybookRepository.save(accountBook);
-      return accountBook;
-    } catch (error) {
-      if (error) {
-        throw new InternalServerErrorException();
-      }
-    }
+  ): Promise<any> {
+      // const accountBook =  await this.moneybookRepository.
+      // createQueryBuilder('accountbook')
+      // .innerJoinAndSelect('accountbook.user',"user")
+      // .where('user.id = :userId', {userId : user.id})
+      // .getMany()
+      // console.log(3232,accountBook)
+        // withDeleted: true,
+      // if (!accountBook) {
+      //   throw new NotFoundException('존재하지 않는 내역입니다.');
+      // }
+      // if (accountBook.deletedAt === null) {
+      //   throw new BadRequestException('삭제되지 않은 내역입니다.');
+      // }
+      // console.log(1111,accountBook)
+      // accountBook.deletedAt = null;
+      // await this.moneybookRepository.save(accountBook);
+       return 'a';
   }
 }
