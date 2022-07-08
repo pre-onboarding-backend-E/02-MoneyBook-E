@@ -31,6 +31,12 @@ import { MoneyBookService } from './moneyBook.service';
 @ApiBearerAuth('access_token')
 @UseGuards(AuthGuard('jwt'))
 export class MoneyBookController {
+  
+  /* 
+    작성자 : 염하늘 / 김용민
+      - CRRUD 컨트롤러 작성 (염하늘)
+      - Restore 컨트롤러 작성 (김용민)
+  */
 
   constructor(private moneybookService: MoneyBookService) {}
 

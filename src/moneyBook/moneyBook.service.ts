@@ -18,17 +18,16 @@ import { MoneyType } from './type/moneyBook.enum';
 @Injectable()
 export class MoneyBookService {
   /* 
-    작성자 : 염하늘
-      - CRRUD 로직 구현
-    부작성자 : 김용민
-      - Restore 로직 구현
+    작성자 : 염하늘 / 김용민
+      - CRRUD 로직 구현 (염하늘)
+      - Restore 로직 구현 (김용민)
   */
   constructor(
     @InjectRepository(MoneyBook)
     private moneybookRepository: Repository<MoneyBook>,
   ) {}
 
-  // 가계부 find
+  // 가계부 내역이 존재하는지 확인함.
   public async existMoneyBook(bookId: number, @GetUser() user: User) {
     const result = await this.moneybookRepository.findOne({
       where: {
@@ -108,7 +107,7 @@ export class MoneyBookService {
     return allMoneyBooks;
   }
 
-  // 유저가 작성한 가계부 상세 내역 수정
+  // 유저가 작성한 가계부 상세 내역을 수정함.
   // 수정을 원하지 않을 경우 해당 key 값을 빼고 보냄.
   public async modifyMoneyBook(
     bookId: number,
@@ -121,7 +120,7 @@ export class MoneyBookService {
         const type = modifyDto.type == 0 ? MoneyType[0] : MoneyType[1];
         const fixedMoney = modifyDto.type == 0 ? modifyDto.money : -modifyDto.money;
 
-        // 존재하는지 확인
+        // 해당 유저가 작성한 가계부 내역 존재하는지 확인
         await this.existMoneyBook(bookId, user);
 
         let newTotal = 0;
@@ -149,12 +148,12 @@ export class MoneyBookService {
       }
     } catch (error) {
       if (error) {
-        throw new BadRequestException();
+        throw new BadRequestException('수정할 내역이 올바르게 입력되지 않았습니다.');
       }
     }
   }
 
-  // 유저가 작성한 가계부 상세 내역 삭제 (soft delete 처리하여 내역은 존재함.)
+  // 유저가 작성한 가계부 상세 내역을 삭제함. (soft delete 처리하여 내역은 존재함.)
   public async deleteMoneyBook(bookId: number, user: User) {
     const result = await this.existMoneyBook(bookId, user);
     if (result) {
@@ -167,7 +166,7 @@ export class MoneyBookService {
     }
   }
 
-  // 유저가 삭제한 가계부 내역 복구
+  // 유저가 삭제한 가계부 내역을 복구함.
   public async restoreMoneyBook(id: number): Promise<MoneyBook> {
     const accountBook = await this.moneybookRepository.findOne({
       where: { id },
