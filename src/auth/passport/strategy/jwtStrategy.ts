@@ -6,7 +6,7 @@ import { UserService } from 'src/user/user.service';
 
 /* 
   작성자 : 김용민
-   - passport-jwt strategy를 구체화
+   - passport jwt strategy를 구체화
 */
 
 @Injectable()

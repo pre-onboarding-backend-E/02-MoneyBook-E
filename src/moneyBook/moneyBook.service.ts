@@ -29,10 +29,7 @@ export class MoneyBookService {
   // 가계부 내역이 존재하는지 확인하고 존재하면 해당 정보를 불러옴.
   public async getMoneyBook(bookId: number, user: User) {
     const result = await this.moneybookRepository.findOne({
-      where: {
-        id: bookId,
-        user: user.id,
-      },
+      where: [ { id: bookId }, user ]
     });
     if (result) {
       return result;
@@ -43,9 +40,7 @@ export class MoneyBookService {
   // 로그인한 유저가 작성한 가계부 내역 중 가장 최신의 정보을 불러옴. 
   public async latestMoneyBook(user: User) {
     const latestResult = await this.moneybookRepository.findOne({
-      where: {
-        user: user.id,
-      },
+      where: [ user ],
       order: {
         updatedAt: 'DESC',
         createdAt: 'DESC',
@@ -72,7 +67,7 @@ export class MoneyBookService {
     moneyBook.description = createDto.description;
     moneyBook.money = createDto.money;
     moneyBook.type = createDto.type == 0 ? MoneyType[0] : MoneyType[1];
-    moneyBook.user = user.id;
+    moneyBook.user = user;
     const currentMoney = createDto.type == 0 ? moneyBook.money : -moneyBook.money;
 
     const latestTotal = await this.latestMoneyBook(user);
@@ -101,9 +96,7 @@ export class MoneyBookService {
   // 유저가 작성한 가계부 목록 (내역) 최신 순으로 조회
   public async getAllMoneyBooks(user: User): Promise<MoneyBook[]> {
     const allMoneyBooks = await this.moneybookRepository.find({
-      where: {
-        user: user.id,
-      },
+      where: [ user ], 
       order: {
         createdAt: 'DESC',
       },
