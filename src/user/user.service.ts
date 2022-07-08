@@ -3,6 +3,7 @@ import {
   ConflictException,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -56,9 +57,13 @@ export class UserService {
 
   // 이메일로 사용자를 가져옵니다.
   async getUserByEmail(email: string): Promise<User | undefined> {
-    return this.userRepository.findOne({
-      where: { email },
-    });
+    const user = this.userRepository.findOne({ where: { email } });
+
+    if (!user) {
+      throw new NotFoundException('해당 사용자를 찾을 수 없습니다.');
+    }
+
+    return user;
   }
 
   async setCurrentRefreshToken(refreshToken: string, email: string) {

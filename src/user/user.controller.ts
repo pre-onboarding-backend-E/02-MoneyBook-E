@@ -3,7 +3,6 @@ import {
   Body,
   Controller,
   Post,
-  ValidationPipe,
   UseGuards,
   Res,
   Get,
@@ -27,6 +26,10 @@ import { LocalAuthGuard } from 'src/auth/passport/guard/localAuthGuard';
 import { GetUser } from 'src/common/getUserDecorator';
 import { MSG } from 'src/common/response.enum';
 
+/* 
+  작성자 : 김용민, 박신영
+  부작성자 : 염하늘, 김태영
+*/
 @ApiTags('User')
 @Controller()
 export class UserController {
@@ -34,10 +37,6 @@ export class UserController {
     private readonly userService: UserService,
     private readonly authService: AuthService,
   ) {}
-  /* 
-    작성자 : 김용민, 박신영
-    부작성자 : 염하늘, 김태영
-  */
 
   // 로그인
   @ApiBody({ type: LoginDto })
