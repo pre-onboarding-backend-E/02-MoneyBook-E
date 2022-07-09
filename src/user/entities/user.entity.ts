@@ -46,8 +46,9 @@ export class User {
 
   // moneyBook과 1:N 관계 형성
   // @OnetoMany(() =>  )
-  @OneToMany(() => MoneyBook, (moneyBook) => moneyBook.user)
-  moneyBook: MoneyBook[];
+
+  @OneToMany(() => MoneyBook, (moneyBook) => moneyBook.user, { nullable: true })
+  moneyBooks: MoneyBook[];
 
   toJSON() {
     return classToPlain(this);
