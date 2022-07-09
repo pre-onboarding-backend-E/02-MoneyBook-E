@@ -1,8 +1,10 @@
 import { Test } from '@nestjs/testing';
+import { classToPlain } from 'class-transformer';
 import { async } from 'rxjs';
 import { User } from 'src/user/entities/user.entity';
 
 import { DataSource, QueryRunner, Repository } from 'typeorm';
+import { CreateMoneyBookDto } from '../dto/createMoneyBook.dto';
 import { MoneyBook } from '../entities/moneyBook.entity';
 import { MoneyBookService } from '../moneyBook.service';
 
@@ -71,7 +73,10 @@ describe('MoneyBookService', () => {
         password: '1234abcd',
         createdAt: new Date(),
         updatedAt: new Date(),
-        moneyBook: [],
+        moneyBooks: [],
+        toJSON() {
+          return classToPlain(this);
+        },
       };
 
       moneyBookRepository.findOne.mockResolvedValueOnce({
@@ -100,9 +105,12 @@ describe('MoneyBookService', () => {
         id: 1,
         email: 'team01@naver.com',
         password: '1234abcd',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        moneyBook: [],
+        createdAt: new Date('2022-07-06T14:49:09.929Z'),
+        updatedAt: new Date('2022-07-06T14:49:09.929Z'),
+        moneyBooks: [],
+        toJSON() {
+          return classToPlain(this);
+        },
       };
 
       moneyBookRepository.findOne.mockResolvedValueOnce([
@@ -129,14 +137,64 @@ describe('MoneyBookService', () => {
     });
   });
 
+  describe('createMoneyBook', () => {
+    it('가계부 생성', async () => {
+      const createDto: CreateMoneyBookDto = {
+        money: 3000,
+        type: 1,
+        description: '콜라 구매',
+      };
+      const user: User = {
+        id: 1,
+        email: 'team01@naver.com',
+        password: '1234abcd',
+        createdAt: new Date('2022-07-06T14:49:09.929Z'),
+        updatedAt: new Date('2022-07-06T14:49:09.929Z'),
+        moneyBooks: [],
+        toJSON() {
+          return classToPlain(this);
+        },
+      };
+      const queryRunner = dataSource.createQueryRunner();
 
-  describe('createMoneyBook',()=>{
-    it(){}
-  })
+      jest.spyOn(queryRunner.manager, 'save').mockResolvedValueOnce({
+        id: 1,
+        money: 3000,
+        type: 1,
+        description: '콜라 구매',
+        total: 10000,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        deletedAt: null,
+        user: { id: 1 },
+      });
 
+      const qrSpyOnFindOne = jest.spyOn(queryRunner.manager, 'findOne');
+      const qrSpyOnSave = jest.spyOn(queryRunner.manager, 'save');
+      const qrSpyOnCommit = jest.spyOn(queryRunner, 'commitTransaction');
+      const qrSpyOnRollback = jest.spyOn(queryRunner, 'rollbackTransaction');
+      const qrSpyOnRelease = jest.spyOn(queryRunner, 'release');
 
+      moneyBookRepository.create.mockResolvedValue({
+        id: 1,
+        money: 3000,
+        type: 1,
+        description: '콜라 구매',
+        total: 10000,
+        createdAt: new Date('2022-07-06T14:49:09.929Z'),
+        updatedAt: new Date('2022-07-06T14:49:09.929Z'),
+        deletedAt: null,
+        user: { id: 1 },
+      });
 
+      const result = await moneyBookService.createMoneyBook(createDto, user);
 
-
-
+      expect(result).toEqual(createDto);
+      expect(qrSpyOnFindOne).toHaveBeenCalledTimes(3);
+      expect(qrSpyOnSave).toHaveBeenCalledTimes(1);
+      expect(qrSpyOnCommit).toHaveBeenCalledTimes(1);
+      expect(qrSpyOnRollback).toHaveBeenCalledTimes(0);
+      expect(qrSpyOnRelease).toHaveBeenCalledTimes(1);
+    });
+  });
 });
