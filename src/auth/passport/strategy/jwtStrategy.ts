@@ -27,7 +27,6 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   async validate(payload) {
     const { email } = payload;
     const user: User = await this.userService.getUserByEmail(email);
-
     if (!user) {
       throw new UnauthorizedException('유효한 사용자가 아닙니다.');
     }
