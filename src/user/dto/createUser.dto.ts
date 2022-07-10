@@ -10,7 +10,6 @@ import {
 
 export class CreateUserDTO {
   @ApiProperty({ description: '이메일', example: 'test@mail.com' })
-  @IsString()
   @IsEmail()
   @IsNotEmpty()
   readonly email: string;
