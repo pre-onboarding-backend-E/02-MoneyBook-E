@@ -22,7 +22,7 @@ export class AuthService {
   // 유저가 존재하는지 확인
   async validateUser(payload: LoginDto): Promise<User> {
     const { password, email } = payload;
-    
+
     const user: User = await this.userService.getUserByEmail(email);
     await this.verifyPassword(password, user.password);
 
@@ -44,7 +44,9 @@ export class AuthService {
   // 로그인 시 필요한 access token과 refresh 토큰을 가져옴
   async getTokens(email: string) {
     const { accessToken, accessOption } = await this.getJwtAccessToken(email);
-    const { refreshToken, refreshOption } = await this.getJwtRefreshToken(email);
+    const { refreshToken, refreshOption } = await this.getJwtRefreshToken(
+      email,
+    );
 
     return { accessToken, accessOption, refreshToken, refreshOption };
   }
@@ -77,19 +79,13 @@ export class AuthService {
     });
 
     const refreshOption = defaultTokenOption;
-
     return { refreshToken, refreshOption };
   }
 
   // 로그아웃 시 초기화한 쿠키 옵션을 전달한다.
   getCookiesForLogOut() {
-    const accessOption = defaultTokenOption;
-    accessOption.maxAge = 0;
-
-    const refreshOption = defaultTokenOption;
-    refreshOption.maxAge = 0;
-
+    const accessOption = { ...defaultTokenOption, maxAge: 0 };
+    const refreshOption = { ...defaultTokenOption, maxAge: 0 };
     return { accessOption, refreshOption };
   }
 }
-

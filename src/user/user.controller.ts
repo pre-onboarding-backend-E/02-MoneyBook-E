@@ -27,6 +27,7 @@ import { LocalAuthGuard } from 'src/auth/passport/guard/localAuthGuard';
 import { GetUser } from 'src/common/getUserDecorator';
 import { MSG } from 'src/common/response.enum';
 import { defaultTokenOption } from 'src/common/tokenOption.interface';
+import { JwtAuthGuard } from 'src/auth/passport/guard/jwtAuthGuard';
 
 /* 
   작성자 : 박신영, 김용민
@@ -81,7 +82,7 @@ export class UserController {
   */
   @ApiBearerAuth('access_token')
   @ApiCreatedResponse({ description: '성공' })
-  @UseGuards(JwtRefreshGuard)
+  @UseGuards(JwtAuthGuard)
   @Post('/logout')
   async logout(
     @Res({ passthrough: true }) res: Response,
@@ -89,7 +90,7 @@ export class UserController {
   ) {
     const { accessOption, refreshOption } =
       this.authService.getCookiesForLogOut();
-    
+
     await this.userService.removeRefreshToken(user.id);
 
     res.cookie('Authentication', '', accessOption);

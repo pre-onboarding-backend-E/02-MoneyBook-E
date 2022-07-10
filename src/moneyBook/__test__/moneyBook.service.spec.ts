@@ -14,6 +14,11 @@ import { ModifyMoneyBookDto } from '../dto/modifyMoneyBook.dto';
 import { MoneyBook } from '../entities/moneyBook.entity';
 import { MoneyBookService } from '../moneyBook.service';
 
+/* 
+    작성자 : 김태영
+      - moneyBook.service 유닛 테스트 파일 작성
+  */
+
 type MockRepository<T = any> = Partial<Record<keyof Repository<T>, jest.Mock>>;
 
 const mockRepository = () => ({
