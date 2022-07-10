@@ -1,11 +1,59 @@
 # 2주차-MoneyBook-project 💫
 
-**프로젝트 개요** ) 한두 줄 정리
 
-- 요구사항 분석 간단 정리
-- (+혹은 디테일하게 분석과정 정리)
 
-**팀원**
+### :sunny: ​프로젝트 개요 
+
+---
+
+가계부 API 서버를 구현합니다. 사용자는 인증을 거쳐 가계부에 접근할 수 있고, 가계부 내역을 관리합니다.
+
+
+
+### :bookmark: 목차
+
+---
+
+[프로젝트 개요](#sunny-​프로젝트-개요)
+[요구사항 분석](#question-요구사항-분석)
+[프로젝트 실행 및 테스트](#fullmoon-​프로젝트-실행-및-테스트)
+[핵심 기능](#key-핵심-기능)
+[기술 스택](#cd-기술-스택)
+[ETC](#clap-​기타)
+
+
+### :question: 요구사항 분석
+
+---
+
+#### :lock: 인증
+
+* 회원가입과, 로그인, 로그아웃 API를 개발합니다.
+* 로그인하지 않은 사용자는 가계부 내역에 접근할 수 없습니다.
+* JWT로 Access Token과 Refresh Token을 관리합니다.
+
+#### :blue_book: 가계부
+
+* Create : 사용한 돈의 금액과 관련 메모를 남깁니다.
+* Update : 사용한 금액과 관련 메모 수정합니다.
+* Delete : 원하는 내역 삭제합니다. (soft-delte)
+* Restore : 삭제한 내역을 복구할 수 있습니다.
+* Read (list) : 사용자의 가계부 목록을 조회합니다.
+* Read (detail) : 사용자의 가계부 상세목록을 가져옵니다.
+
+:file_folder: ETC 
+
+* [ERD](https://user-images.githubusercontent.com/57704568/178136467-1758f4ca-e7ea-4532-83b4-ed92a075ea10.png) 
+* Docker와 GCP를 사용한 배포 : [http://34.64.239.67:3000/](http://34.64.239.67:3000/)
+* Unit Test 작성
+* Lint, Prettier 포맷팅
+
+
+
+### :family: 팀원
+
+---
+
 | 이름 | Github | email | blog |
 | --- | --- | --- | --- |
 | 염하늘 | everchloe97 | star57009@khu.ac.kr | |
@@ -13,59 +61,86 @@
 | 김태영 | leokim1178 | leo950906@gmail.com | 0tae’s devlog |
 | 박신영 | ParkShinyeong | syngh503@gmail.com | 신영의 notion |
 
-**ENV**
-`example`
 
-<aside>
-💡 
-DB_HOST=database-server
-<br>
-DB_PORT=3306
-<br>
-DB_USERNAME=root
-<br>
-DB_PASSWORD=2222
-<br>
-DB_DATABASE=money-book
 
-</aside>
-<br>
+:cloud: **ENV** 
 
-**프로젝트 실행 및 테스트)**
+---
 
-1. 실행 방법 (yarn ~ docker~)
+  ```
+  DB_HOST=database-server
+  DB_PORT=3306
+  DB_USERNAME=root
+  DB_PASSWORD=2222
+  DB_DATABASE=money-book
+  JWT_SECRET_KEY= ??
+  JWT_EXPIRATION_TIME= ?? (ex / 1h 형식으로 작성합니다.)
+  JWT_REFRESH_TOKEN_SECRET= ??
+  JWT_REFRESH_TOKEN_EXPIRATION_TIME= ?? (ex / 1h 형식으로 작성합니다.)
+  ```
+* /env/.env 에 다음과 같이 환경 변수를 설정합니다. 
 
-<aside>
-💡
-</aside>
 
-1. 테스트 방법 - 테스트 코드 (test ~)
 
-<aside>
-💡
-</aside>
+### :full_moon: ​프로젝트 실행 및 테스트
 
-1. 배포 (url~ )
+---
 
-<aside>
-💡
-</aside>
+1. 실행 💡
+  ```
+  cd 02-MoneyBook-E/
+  docker compose build
+  docker compose up
+  ```
+2. 테스트 💡
+  ```
+  yarn test
+  ```
+3. Swagger API 💡
+  ```
+  1. swagger (api 문서)
+    - localhost:3000/api/docs 접속 - local
+    - 배포 ip /접속 - 배포
+  2. sign up을 통해 user를 생성하고 login 후 api를 테스트 할 수 있습니다.
+  ```
 
-1. [API 문서](localhost:3000/api/docs) 
 
-<aside>
-💡
 
-</aside>
+### :key: 핵심 기능
 
-**핵심 기능**) 정리
+---
 
-- - 000 목록 불러오기 / 000 api 호출하기 등 간결하게 listing
+- __User (사용자)__ 🙍‍♀️🙍‍♂️
+  - 회원가입 
+  - 로그인 
+  - 로그아웃
+  - 토큰 재발급
+- __Money book (가계부)__ 💰📝
+  - 가계부 작성 
+  - 가계부 수정 
+  - 가계부 목록 조회
+  - 가계부 상세 조회 
+  - 가계부 삭제  
+  - 삭제된 가계부 내역 복구
 
-**기술 스택** ) 정리
 
-- 스티커 형식으로 보기 좋게
 
-**기타**) ERD / 개발 요구사항 분석 과정 / commit Convention 등 ... 자유롭게
+### :cd: 기술 스택 
 
-- 사진 첨부
+---
+
+<img src="https://img.shields.io/badge/Typescript-3178C6?style=flat&logo=typescript&logoColor=white"/>
+<img src="https://img.shields.io/badge/NestJS-E0234E?style=flat&logo=nestjs&logoColor=white"/>
+<img src="https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white"/>
+<img src="https://img.shields.io/badge/MySQL-4479A1?style=flat&logo=mysql&logoColor=white"/>
+<img src="https://img.shields.io/badge/NodeJS-339933?style=flat&logo=nodejs&logoColor=white"/>
+<img src="https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white"/>
+
+
+
+### :clap: ​기타
+
+---
+
+- Commit Convention
+  [Ref. Commit Convention](https://github.com/pre-onboarding-backend-E/02-MoneyBook-E/wiki/Commit-Convention)
