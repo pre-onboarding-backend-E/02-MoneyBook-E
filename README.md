@@ -34,9 +34,10 @@
 
 #### :blue_book: 가계부
 
+
 - Create : 사용한 돈의 금액과 관련 메모를 남깁니다.
 - Update : 사용한 금액과 관련 메모 수정합니다.
-- Delete : 원하는 내역 삭제합니다. (soft-delte)
+- Delete : 원하는 내역 삭제합니다. (soft-delete)
 - Restore : 삭제한 내역을 복구할 수 있습니다.
 - Read (list) : 사용자의 가계부 목록을 조회합니다.
 - Read (detail) : 사용자의 가계부 상세목록을 가져옵니다.
@@ -133,3 +134,4 @@ yarn test
 <img src="https://img.shields.io/badge/MySQL-4479A1?style=flat&logo=mysql&logoColor=white"/>
 <img src="https://img.shields.io/badge/NodeJS-339933?style=flat&logo=nodejs&logoColor=white"/>
 <img src="https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white"/>
+
