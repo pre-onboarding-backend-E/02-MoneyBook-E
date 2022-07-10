@@ -48,7 +48,6 @@ export class MoneyBookController {
     description: MSG.createOne.msg,
     type: DefaultResponse,
   })
-
   async createOne(@Body() createDto: CreateMoneyBookDto,@GetUser() user : User) {
     const result = await this.moneybookService.createMoneyBook(createDto,user);
     return DefaultResponse.response(result, MSG.createOne.code, MSG.createOne.msg);
@@ -101,7 +100,7 @@ export class MoneyBookController {
     type: DefaultResponse,
   })
   async restoreOne(@Param('id', ParseIntPipe) id: number,@GetUser() user : User) {
-    const result = await this.moneybookService.restoreMoneyBook(id,user);
+    const result = await this.moneybookService.restoreMoneyBook(id, user);
     return DefaultResponse.response(result, MSG.restoreOne.code, MSG.restoreOne.msg);
   }
 }

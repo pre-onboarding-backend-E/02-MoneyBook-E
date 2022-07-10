@@ -22,7 +22,7 @@ export class AuthService {
   // 유저가 존재하는지 확인
   async validateUser(payload: LoginDto): Promise<User> {
     const { password, email } = payload;
-
+    
     const user: User = await this.userService.getUserByEmail(email);
     await this.verifyPassword(password, user.password);
 
@@ -39,7 +39,6 @@ export class AuthService {
     if (!isPasswordMatched) {
       throw new BadRequestException('잘못된 비밀번호입니다.');
     }
-    return isPasswordMatched;
   }
 
   // 로그인 시 필요한 access token과 refresh 토큰을 가져옴
@@ -72,7 +71,7 @@ export class AuthService {
   // RefreshToken 발급
   async getJwtRefreshToken(email: string): Promise<any> {
     const payload = { email };
-    const refreshToken = this.jwtService.sign(payload, {
+    const refreshToken = await this.jwtService.sign(payload, {
       secret: process.env.JWT_REFRESH_TOKEN_SECRET,
       expiresIn: process.env.JWT_REFRESH_TOKEN_EXPIRATION_TIME,
     });
@@ -93,3 +92,4 @@ export class AuthService {
     return { accessOption, refreshOption };
   }
 }
+

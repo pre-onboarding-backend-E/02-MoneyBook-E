@@ -41,13 +41,14 @@ export class User {
 
   @ApiProperty()
   @Column({ nullable: true })
-  @Exclude()
+  @Exclude({ toPlainOnly: true })
   hashedRefreshToken!: 'string';
 
   // moneyBook과 1:N 관계 형성
   // @OnetoMany(() =>  )
-  @OneToMany(() => MoneyBook, (moneyBook) => moneyBook.user)
-  moneyBook: MoneyBook[];
+
+  @OneToMany(() => MoneyBook, (moneyBook) => moneyBook.user, { nullable: true })
+  moneyBooks: MoneyBook[];
 
   toJSON() {
     return classToPlain(this);
