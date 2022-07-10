@@ -4,6 +4,7 @@ import {
   Controller,
   Delete,
   Get,
+  InternalServerErrorException,
   Param,
   ParseIntPipe,
   Patch,
@@ -26,12 +27,12 @@ import { CreateMoneyBookDto } from './dto/createMoneyBook.dto';
 import { ModifyMoneyBookDto } from './dto/modifyMoneyBook.dto';
 import { DefaultResponse } from './dto/moneyBook.response';
 import { MoneyBookService } from './moneyBook.service';
-import { JwtAuthGuard } from 'src/auth/passport/guard/jwtAuthGuard';
+import internal from 'stream';
 
 @ApiTags('AccountBooks')
 @Controller('accountBooks')
 @ApiBearerAuth('access_token')
-@UseGuards(JwtAuthGuard)
+@UseGuards(AuthGuard('jwt'))
 export class MoneyBookController {
   
   /* 
@@ -47,7 +48,7 @@ export class MoneyBookController {
     description: MSG.createOne.msg,
     type: DefaultResponse,
   })
-  async createOne(@Body(ValidationPipe) createDto: CreateMoneyBookDto,@GetUser() user : User) {
+  async createOne(@Body() createDto: CreateMoneyBookDto,@GetUser() user : User) {
     const result = await this.moneybookService.createMoneyBook(createDto,user);
     return DefaultResponse.response(result, MSG.createOne.code, MSG.createOne.msg);
   }
@@ -98,8 +99,8 @@ export class MoneyBookController {
     description: MSG.restoreOne.msg,
     type: DefaultResponse,
   })
-  async restoreOne(@Param('id', ParseIntPipe) id: number) {
-    const result = await this.moneybookService.restoreMoneyBook(id);
+  async restoreOne(@Param('id', ParseIntPipe) id: number,@GetUser() user : User) {
+    const result = await this.moneybookService.restoreMoneyBook(id, user);
     return DefaultResponse.response(result, MSG.restoreOne.code, MSG.restoreOne.msg);
   }
 }

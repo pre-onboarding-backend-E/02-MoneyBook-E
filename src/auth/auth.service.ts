@@ -39,6 +39,7 @@ export class AuthService {
     if (!isPasswordMatched) {
       throw new BadRequestException('잘못된 비밀번호입니다.');
     }
+    return isPasswordMatched;
   }
 
   // 로그인 시 필요한 access token과 refresh 토큰을 가져옴

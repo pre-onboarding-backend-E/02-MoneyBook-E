@@ -57,8 +57,8 @@ export class UserController {
 
     res.cookie('Authentication', accessToken, accessOption);
     res.cookie('Refresh', refreshToken, refreshOption);
-
-    return UserResponse.response(accessToken, MSG.loginUser.code, MSG.loginUser.msg);
+    const result = accessToken;
+    return UserResponse.response(result, MSG.loginUser.code, MSG.loginUser.msg);
   }
 
   /* 
@@ -67,14 +67,12 @@ export class UserController {
   @Post('/signup')
   @ApiBody({ type: CreateUserDTO })
   @ApiCreatedResponse({ description: MSG.createUser.msg, type: UserResponse })
-  async signUp(
-    @Body() createUserDto: CreateUserDTO,
-  ) {
-    const user = await this.userService.createUser(createUserDto);
+  async signUp(@Body(ValidationPipe) createUserDto: CreateUserDTO) {
+    const result = await this.userService.createUser(createUserDto);
     return UserResponse.response(
-      user.toJSON(), 
-      MSG.createUser.code, 
-      MSG.createUser.msg
+      result,
+      MSG.createUser.code,
+      MSG.createUser.msg,
     );
   }
 
@@ -89,17 +87,20 @@ export class UserController {
     @Res({ passthrough: true }) res: Response,
     @GetUser() user: User,
   ) {
-    const { accessOption, refreshOption } = this.authService.getCookiesForLogOut();
+    const { accessOption, refreshOption } =
+      this.authService.getCookiesForLogOut();
+    console.log(user);
     await this.userService.removeRefreshToken(user.id);
-    
+
     res.cookie('Authentication', '', accessOption);
     res.cookie('Refresh', '', refreshOption);
 
-    return UserResponse.response(
-      user.toJSON(),
-      MSG.logoutUser.code, 
-      MSG.logoutUser.msg
+    const result = UserResponse.response(
+      user,
+      MSG.logoutUser.code,
+      MSG.logoutUser.msg,
     );
+    return result;
   }
 
   /* 
@@ -108,16 +109,19 @@ export class UserController {
   @UseGuards(JwtRefreshGuard)
   @ApiBearerAuth('access_token')
   @Get('/refreshToken')
-  async refresh(@GetUser() user: User, @Res({ passthrough: true }) res: Response) {
+  async refresh(
+    @GetUser() user: User,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const accessToken = await this.authService.getJwtAccessToken(user.email);
     const accessOption = defaultTokenOption;
-    
-    res.cookie('Authentication', accessToken, accessOption);
 
-    return UserResponse.response(
-      user.toJSON(), 
-      MSG.refreshTokenWithUser.code, 
-      MSG.refreshTokenWithUser.msg
+    res.cookie('Authentication', accessToken, accessOption);
+    const result = UserResponse.response(
+      user,
+      MSG.refreshTokenWithUser.code,
+      MSG.refreshTokenWithUser.msg,
     );
+    return result;
   }
 }
