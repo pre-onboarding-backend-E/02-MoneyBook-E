@@ -47,6 +47,8 @@
 * Docker와 GCP를 사용한 배포 : [http://34.64.239.67:3000/](http://34.64.239.67:3000/)
 * Unit Test 작성
 * Lint, Prettier 포맷팅
+* Commit Convention
+  [Ref. Commit Convention](https://github.com/pre-onboarding-backend-E/02-MoneyBook-E/wiki/Commit-Convention)
 
 
 
@@ -136,11 +138,4 @@
 <img src="https://img.shields.io/badge/NodeJS-339933?style=flat&logo=nodejs&logoColor=white"/>
 <img src="https://img.shields.io/badge/GitHub-181717?style=flat&logo=github&logoColor=white"/>
 
-
-
-### :clap: ​기타
-
 ---
-
-- Commit Convention
-  [Ref. Commit Convention](https://github.com/pre-onboarding-backend-E/02-MoneyBook-E/wiki/Commit-Convention)
