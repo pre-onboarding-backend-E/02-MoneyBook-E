@@ -17,7 +17,7 @@ import {
 } from '@nestjs/swagger';
 import { Response } from 'express';
 import { AuthService } from 'src/auth/auth.service';
-import { LoginDto } from 'src/user/dto/login.dto';
+import { LoginDto, UserData } from 'src/user/dto/login.dto';
 import { UserResponse } from 'src/user/dto/login.response';
 import { CreateUserDTO } from './dto/createUser.dto';
 import { User } from './entities/user.entity';
@@ -29,7 +29,6 @@ import { defaultTokenOption } from 'src/common/tokenOption.interface';
 
 /* 
   작성자 : 박신영, 김용민
-  부작성자 : 염하늘, 김태영
 */
 @ApiTags('User')
 @Controller()
@@ -43,13 +42,14 @@ export class UserController {
     - access token, resfresh token 발급하여 로그인 처리
   */
   @ApiBody({ type: LoginDto })
-  @ApiCreatedResponse({ description: MSG.loginUser.msg })
+  @ApiCreatedResponse({ description: MSG.loginUser.msg, type: UserResponse })
   @UseGuards(LocalAuthGuard)
   @Post('/login')
   async login(
-    @Body(ValidationPipe) userData: LoginDto,
+    @Body() req: UserData,
     @Res({ passthrough: true }) res: Response,
   ) {
+    const userData = req.data;
     const { accessToken, accessOption, refreshToken, refreshOption } =
       await this.authService.getTokens(userData.email);
 
@@ -68,7 +68,7 @@ export class UserController {
   @ApiBody({ type: CreateUserDTO })
   @ApiCreatedResponse({ description: MSG.createUser.msg, type: UserResponse })
   async signUp(
-    @Body(ValidationPipe) createUserDto: CreateUserDTO,
+    @Body() createUserDto: CreateUserDTO,
   ) {
     const user = await this.userService.createUser(createUserDto);
     return UserResponse.response(

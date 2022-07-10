@@ -13,10 +13,8 @@ import * as bcrypt from 'bcryptjs';
 import { compare } from 'bcryptjs';
 
 /* 
-    작성자 : 김용민, 박신영
-    부작성자 : 염하늘, 김태영
+  작성자 : 김용민, 박신영
 */
-
 @Injectable()
 export class UserService {
   constructor(
@@ -58,7 +56,7 @@ export class UserService {
     - 이메일로 사용자를 가져옵니다.
   */
   async getUserByEmail(email: string): Promise<User | undefined> {
-    const user = this.userRepository.findOne({ where: { email } });
+    const user = await this.userRepository.findOne({ where: { email } });
 
     if (!user) {
       throw new NotFoundException('해당 사용자를 찾을 수 없습니다.');

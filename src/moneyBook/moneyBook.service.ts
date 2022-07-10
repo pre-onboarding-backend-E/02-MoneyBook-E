@@ -80,19 +80,6 @@ export class MoneyBookService {
     return createdMoneyBook;
   }
 
-  // 유저가 작성한 가계부 내역 상세 조회
-  // public async getMoneyBook(bookId: number, @GetUser() user: User) {
-  //   try {
-  //     const result = await this.existMoneyBook(bookId, user);
-  //     return result;
-  //   } catch (error) {
-  //     if (error) {
-  //       throw new NotFoundException('존재하지 않는 내역입니다.');
-  //     } else {
-  //       throw new InternalServerErrorException(); // handling 해야 함. 가려야 함.
-  //     }
-  //   }
-  // }
   // 유저가 작성한 가계부 목록 (내역) 최신 순으로 조회
   public async getAllMoneyBooks(user: User): Promise<MoneyBook[]> {
     const allMoneyBooks = await this.moneybookRepository.find({
@@ -164,7 +151,7 @@ export class MoneyBookService {
   }
 
   // 유저가 삭제한 가계부 내역을 복구함.
-  public async restoreMoneyBook(bookId: number): Promise<MoneyBook> { // try catch
+  public async restoreMoneyBook(bookId: number): Promise<MoneyBook> {
     const accountBook = await this.moneybookRepository.findOne({
       where: { id : bookId },
       withDeleted: true,

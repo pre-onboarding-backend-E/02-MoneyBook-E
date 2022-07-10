@@ -22,7 +22,7 @@ export class AuthService {
   // 유저가 존재하는지 확인
   async validateUser(payload: LoginDto): Promise<User> {
     const { password, email } = payload;
-
+    
     const user: User = await this.userService.getUserByEmail(email);
     await this.verifyPassword(password, user.password);
 
@@ -92,3 +92,4 @@ export class AuthService {
     return { accessOption, refreshOption };
   }
 }
+

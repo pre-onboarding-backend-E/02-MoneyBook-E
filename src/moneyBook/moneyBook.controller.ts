@@ -26,11 +26,12 @@ import { CreateMoneyBookDto } from './dto/createMoneyBook.dto';
 import { ModifyMoneyBookDto } from './dto/modifyMoneyBook.dto';
 import { DefaultResponse } from './dto/moneyBook.response';
 import { MoneyBookService } from './moneyBook.service';
+import { JwtAuthGuard } from 'src/auth/passport/guard/jwtAuthGuard';
 
 @ApiTags('AccountBooks')
 @Controller('accountBooks')
 @ApiBearerAuth('access_token')
-@UseGuards(AuthGuard('jwt'))
+@UseGuards(JwtAuthGuard)
 export class MoneyBookController {
   
   /* 
@@ -46,7 +47,6 @@ export class MoneyBookController {
     description: MSG.createOne.msg,
     type: DefaultResponse,
   })
-
   async createOne(@Body(ValidationPipe) createDto: CreateMoneyBookDto,@GetUser() user : User) {
     const result = await this.moneybookService.createMoneyBook(createDto,user);
     return DefaultResponse.response(result, MSG.createOne.code, MSG.createOne.msg);
