@@ -1,71 +1,112 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from '../auth.service';
+import { UserService } from 'src/user/user.service';
+import { User } from 'src/user/entities/user.entity';
+import { DataSource, QueryBuilder } from 'typeorm';
+import { LoginDto } from 'src/user/dto/login.dto';
+import { classToPlain } from 'class-transformer';
+import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { compare } from 'bcryptjs';
 
-class MockUserRepository {
-  hashedPassword = bcrypt.hash('abcd1234', bcrypt.genSalt());
-  db = [
-    {
-      id: 1,
-      email: 'team02@naver.com',
-      password: this.hashedPassword,
-      createdAt: new Date('2022-07-06T14:49:09.929Z'),
-      updatedAt: new Date('2022-07-06T14:49:09.929Z'),
-      hashedRefreshToken: null,
-    },
-  ];
-}
+const mockUserRepository = () => ({
+  findOne: jest.fn(),
+  create: jest.fn(),
+  save: jest.fn(),
+  update: jest.fn(),
+});
 
 describe('AuthService', () => {
   let authService: AuthService;
+  let userService: UserService;
 
-  beforeEach(async () => {
+  const qb = {
+    connection: {},
+  } as QueryBuilder<User>;
+
+  class MockDataSource {
+    createQueryBuilder(): QueryBuilder<User> {
+      return qb;
+    }
+  }
+
+  let email: string;
+  let plainPassword: string;
+  let hashedPassword: string;
+  let payload: LoginDto;
+  let user: User;
+  beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [AuthService],
+      providers: [
+        AuthService,
+        UserService,
+        JwtService,
+
+        { provide: 'UserRepository', useFactory: mockUserRepository },
+        { provide: DataSource, useClass: MockDataSource },
+      ],
     }).compile();
 
     authService = module.get<AuthService>(AuthService);
+    userService = module.get<UserService>(UserService);
+    plainPassword = 'password1234';
+    payload = { email, password: plainPassword };
+    const salt = await bcrypt.genSalt();
+    hashedPassword = await bcrypt.hash(plainPassword, salt);
+
+    user = {
+      id: 1,
+      email: 'team01@naver.com',
+      password: hashedPassword,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      hashedRefreshToken: 'string',
+      moneyBooks: [],
+      toJSON() {
+        return classToPlain(this);
+      },
+    };
+
+    jest.spyOn(userService, 'getUserByEmail').mockRejectedValue(user);
   });
 
-  it('should be defined', () => {
+  it('기본 테스트', () => {
     expect(authService).toBeDefined();
   });
 
-  // describe('유저 확인', () => {
-  //   it('유저 확인', () => {
-  //     // const result = await authService.validateUser({
-  //     //   email: 'team02@naver.com',
-  //     //   password: 'abcd1234',
-  //     // });
-  //     // expect(result).E;
-  //   });
-  //   it('잘못된 비밀번호', () => {
-  //     return;
-  //   });
-  // });
+  describe('validateUser', () => {
+    it('기본 테스트', async () => {
+      expect(authService.validateUser).toBeDefined();
+    });
+  });
 
-  // describe('비밀번호 확인 ', () => {
-  //   it('유저 확인', () => {
-  //     return;
-  //   });
-  // });
+  describe('verifyPassword ', () => {
+    it('기본 테스트', async () => {
+      expect(authService.verifyPassword).toBeDefined();
+    });
+  });
 
-  // describe('Access token 발급', () => {
-  //   it('유저 확인', () => {
-  //     return;
-  //   });
-  // });
+  describe('getTokens', () => {
+    it('기본 테스트', async () => {
+      expect(authService.getTokens).toBeDefined();
+    });
+  });
 
-  // describe('Refresh token 발급', () => {
-  //   it('유저 확인', () => {
-  //     return;
-  //   });
-  // });
+  describe('getJwtAccessToken', () => {
+    it('기본 테스트', async () => {
+      expect(authService.getJwtAccessToken).toBeDefined();
+    });
+  });
 
-  // describe('로그아웃 시 초기화된 쿠키 옵션', () => {
-  //   it('유저 확인', () => {
-  //     return;
-  //   });
-  // });
+  describe('getJwtRefreshToken', () => {
+    it('기본 테스트', async () => {
+      expect(authService.getJwtRefreshToken).toBeDefined();
+    });
+  });
+
+  describe('getCookiesForLogOut', () => {
+    it('기본 테스트', async () => {
+      expect(authService.getCookiesForLogOut).toBeDefined();
+    });
+  });
 });
