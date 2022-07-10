@@ -7,6 +7,7 @@ import {
   Res,
   Get,
   ValidationPipe,
+  Req,
 } from '@nestjs/common';
 import { JwtRefreshGuard } from 'src/auth/passport/guard/jwtRefreshGuard';
 import {
@@ -17,7 +18,7 @@ import {
 } from '@nestjs/swagger';
 import { Response } from 'express';
 import { AuthService } from 'src/auth/auth.service';
-import { LoginDto, UserData } from 'src/user/dto/login.dto';
+import { LoginDto } from 'src/user/dto/login.dto';
 import { UserResponse } from 'src/user/dto/login.response';
 import { CreateUserDTO } from './dto/createUser.dto';
 import { User } from './entities/user.entity';
@@ -46,14 +47,13 @@ export class UserController {
   @UseGuards(LocalAuthGuard)
   @Post('/login')
   async login(
-    @Body() req: UserData,
     @Res({ passthrough: true }) res: Response,
+    @GetUser() user: User,
   ) {
-    const userData = req.data;
     const { accessToken, accessOption, refreshToken, refreshOption } =
-      await this.authService.getTokens(userData.email);
+      await this.authService.getTokens(user.email);
 
-    await this.userService.setCurrentRefreshToken(refreshToken, userData.email);
+    await this.userService.setCurrentRefreshToken(refreshToken, user.email);
 
     res.cookie('Authentication', accessToken, accessOption);
     res.cookie('Refresh', refreshToken, refreshOption);
@@ -67,7 +67,7 @@ export class UserController {
   @Post('/signup')
   @ApiBody({ type: CreateUserDTO })
   @ApiCreatedResponse({ description: MSG.createUser.msg, type: UserResponse })
-  async signUp(@Body(ValidationPipe) createUserDto: CreateUserDTO) {
+  async signUp(@Body() createUserDto: CreateUserDTO) {
     const result = await this.userService.createUser(createUserDto);
     return UserResponse.response(
       result,
@@ -89,7 +89,7 @@ export class UserController {
   ) {
     const { accessOption, refreshOption } =
       this.authService.getCookiesForLogOut();
-    console.log(user);
+    
     await this.userService.removeRefreshToken(user.id);
 
     res.cookie('Authentication', '', accessOption);

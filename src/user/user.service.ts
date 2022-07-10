@@ -96,7 +96,7 @@ export class UserService {
     - Refresh Token 값을 null로 바꿈
   */
   async removeRefreshToken(id: number) {
-    return this.userRepository.update(id, {
+    return await this.userRepository.update(id, {
       hashedRefreshToken: null,
     });
   }

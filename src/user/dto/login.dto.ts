@@ -27,7 +27,3 @@ export class LoginDto {
   @IsNotEmpty()
   readonly password: string;
 }
-
-export class UserData {
-  data: LoginDto;
-}

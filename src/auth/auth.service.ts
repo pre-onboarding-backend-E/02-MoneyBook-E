@@ -71,7 +71,7 @@ export class AuthService {
   // RefreshToken 발급
   async getJwtRefreshToken(email: string): Promise<any> {
     const payload = { email };
-    const refreshToken = this.jwtService.sign(payload, {
+    const refreshToken = await this.jwtService.sign(payload, {
       secret: process.env.JWT_REFRESH_TOKEN_SECRET,
       expiresIn: process.env.JWT_REFRESH_TOKEN_EXPIRATION_TIME,
     });
