@@ -1,7 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { BaseResponse } from 'src/common/baseResponse.dto';
-import { MSG } from 'src/common/response.enum';
 import { MoneyBook } from '../entities/moneyBook.entity';
+
+/* 
+    작성자 : 염하늘
+      - response template 작성
+  */
 
 export abstract class DefaultResponseData {
   @ApiProperty()

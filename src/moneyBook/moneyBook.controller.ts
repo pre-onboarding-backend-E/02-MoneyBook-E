@@ -4,12 +4,14 @@ import {
   Controller,
   Delete,
   Get,
+  InternalServerErrorException,
   Param,
   ParseIntPipe,
   Patch,
   Post,
   Query,
   UseGuards,
+  ValidationPipe,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import {
@@ -25,12 +27,19 @@ import { CreateMoneyBookDto } from './dto/createMoneyBook.dto';
 import { ModifyMoneyBookDto } from './dto/modifyMoneyBook.dto';
 import { DefaultResponse } from './dto/moneyBook.response';
 import { MoneyBookService } from './moneyBook.service';
+import internal from 'stream';
 
 @ApiTags('AccountBooks')
 @Controller('accountBooks')
 @ApiBearerAuth('access_token')
 @UseGuards(AuthGuard('jwt'))
 export class MoneyBookController {
+  
+  /* 
+    작성자 : 염하늘 / 김용민
+      - CRRUD 컨트롤러 작성 (염하늘)
+      - Restore 컨트롤러 작성 (김용민)
+  */
 
   constructor(private moneybookService: MoneyBookService) {}
 
@@ -39,7 +48,6 @@ export class MoneyBookController {
     description: MSG.createOne.msg,
     type: DefaultResponse,
   })
-
   async createOne(@Body() createDto: CreateMoneyBookDto,@GetUser() user : User) {
     const result = await this.moneybookService.createMoneyBook(createDto,user);
     return DefaultResponse.response(result, MSG.createOne.code, MSG.createOne.msg);
@@ -91,8 +99,8 @@ export class MoneyBookController {
     description: MSG.restoreOne.msg,
     type: DefaultResponse,
   })
-  async restoreOne(@Param('id', ParseIntPipe) id: number) {
-    const result = await this.moneybookService.restoreMoneyBook(id);
+  async restoreOne(@Param('id', ParseIntPipe) id: number,@GetUser() user : User) {
+    const result = await this.moneybookService.restoreMoneyBook(id, user);
     return DefaultResponse.response(result, MSG.restoreOne.code, MSG.restoreOne.msg);
   }
 }

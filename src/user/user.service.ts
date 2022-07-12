@@ -3,6 +3,7 @@ import {
   ConflictException,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -12,13 +13,8 @@ import * as bcrypt from 'bcryptjs';
 import { compare } from 'bcryptjs';
 
 /* 
-    작성자 : 김용민, 박신영
-    부작성자 : 염하늘, 김태영
-    
-    UsersService- email및 password로 검색하는 find 메소드
-    사용자 모델 및 지속성 계층을 구축합니다.
-  */
-
+  작성자 : 김용민, 박신영
+*/
 @Injectable()
 export class UserService {
   constructor(
@@ -26,6 +22,9 @@ export class UserService {
     private userRepository: Repository<User>,
   ) {}
 
+  /* 
+    - 비밀번호 체크, 중복 이메일 확인 후 사용자를 추가합니다.
+  */
   async createUser(createUserDto: CreateUserDTO): Promise<User> {
     const { email, password, confirmPassword } = createUserDto;
 
@@ -53,26 +52,37 @@ export class UserService {
     }
   }
 
+  /* 
+    - 이메일로 사용자를 가져옵니다.
+  */
   async getUserByEmail(email: string): Promise<User | undefined> {
-    return this.userRepository.findOne({
-      where: { email: email },
-    });
+    const user = await this.userRepository.findOne({ where: { email } });
+
+    if (!user) {
+      throw new NotFoundException('해당 사용자를 찾을 수 없습니다.');
+    }
+
+    return user;
   }
 
+  /* 
+    - DB에 발급받은 Refresh Token을 암호화하여 저장(bycrypt)
+  */
   async setCurrentRefreshToken(refreshToken: string, email: string) {
-    // DB에 발급받은 Refresh Token을 암호화하여 저장(bycrypt)
     const salt = await bcrypt.genSalt();
     const hashedRefreshToken = await bcrypt.hash(refreshToken, salt);
     await this.userRepository
       .createQueryBuilder()
       .update(User)
-      .set({ hashedRefreshToken: hashedRefreshToken })
+      .set({ hashedRefreshToken })
       .where('email = :email', { email })
       .execute();
   }
 
+  /* 
+    - 데이터베이스 조회 후 Refresh Token이 유효한지 확인
+  */
   async getUserRefreshTokenMatches(refreshToken: string, email: string) {
-    // 데이터베이스 조회 후 Refresh Token이 유효한지 확인
     const user = await this.getUserByEmail(email);
     const isRefreshTokenMatching = await compare(
       refreshToken,
@@ -82,9 +92,11 @@ export class UserService {
     if (isRefreshTokenMatching) return user;
   }
 
+  /* 
+    - Refresh Token 값을 null로 바꿈
+  */
   async removeRefreshToken(id: number) {
-    // Refresh Token 값을 null로 바꿈
-    return this.userRepository.update(id, {
+    return await this.userRepository.update(id, {
       hashedRefreshToken: null,
     });
   }
